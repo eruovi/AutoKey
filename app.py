@@ -341,16 +341,18 @@ def admin_user_role(id):
 
 if __name__ == '__main__':
     with app.app_context():
-        db.create_all()
+    db.create_all()
 
-        if not User.query.filter_by(username='admin').first():
-            admin_user = User(
-                username='admin',
-                password=generate_password_hash('admin123'),
-                role='admin'
-            )
-            db.session.add(admin_user)
-            db.session.commit()
-            print('Создан админ: логин admin, пароль admin123')
+    if not User.query.filter_by(username='admin').first():
+        admin_user = User(
+            username='admin',
+            password=generate_password_hash('admin123'),
+            role='admin'
+        )
+        db.session.add(admin_user)
+        db.session.commit()
+        print('Создан админ: логин admin, пароль admin123')
 
+
+if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=80)
