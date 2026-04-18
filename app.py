@@ -1,5 +1,3 @@
-from textwrap import dedent
-code = dedent('''
 from flask import Flask, render_template, request, redirect, url_for, flash, session
 from flask_sqlalchemy import SQLAlchemy
 from functools import wraps
@@ -43,15 +41,18 @@ PRICES = [
 
 class User(db.Model):
     __tablename__ = 'users'
+
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(100), unique=True, nullable=False)
     password = db.Column(db.String(200), nullable=False)
     role = db.Column(db.String(20), default='client')
+
     orders = db.relationship('Order', backref='user', lazy=True)
 
 
 class Order(db.Model):
     __tablename__ = 'orders'
+
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
     phone = db.Column(db.String(20), nullable=False)
@@ -64,6 +65,7 @@ class Order(db.Model):
 
 class Review(db.Model):
     __tablename__ = 'reviews'
+
     id = db.Column(db.Integer, primary_key=True)
     author = db.Column(db.String(100), nullable=False)
     text = db.Column(db.Text, nullable=False)
@@ -106,14 +108,21 @@ def register():
     if request.method == 'POST':
         username = request.form['username'].strip()
         password = request.form['password'].strip()
+
         if User.query.filter_by(username=username).first():
             flash('Пользователь с таким логином уже существует.')
             return render_template('register.html')
-        user = User(username=username, password=generate_password_hash(password), role='client')
+
+        user = User(
+            username=username,
+            password=generate_password_hash(password),
+            role='client'
+        )
         db.session.add(user)
         db.session.commit()
         flash('Регистрация прошла успешно. Теперь войдите в аккаунт.')
         return redirect(url_for('login'))
+
     return render_template('register.html')
 
 
@@ -122,18 +131,22 @@ def login():
     if request.method == 'POST':
         username = request.form['username'].strip()
         password = request.form['password'].strip()
+
         user = User.query.filter_by(username=username).first()
         if user and check_password_hash(user.password, password):
             session['user_id'] = user.id
             session['username'] = user.username
             session['role'] = user.role
+
             if user.role == 'admin':
                 return redirect(url_for('admin_dashboard'))
             elif user.role == 'manager':
                 return redirect(url_for('admin_orders'))
             else:
                 return redirect(url_for('my_orders'))
+
         flash('Неверный логин или пароль.')
+
     return render_template('login.html')
 
 
@@ -184,14 +197,23 @@ def contact():
         phone = request.form['phone'].strip()
         car_model = request.form['car_model'].strip()
         service = request.form['service'].strip()
+
         if not re.fullmatch(r'\+7[0-9]{10}', phone):
             flash('Введите номер телефона в формате +79991234567')
             return redirect(url_for('contact'))
-        order = Order(name=name, phone=phone, car_model=car_model, service=service, user_id=session.get('user_id'))
+
+        order = Order(
+            name=name,
+            phone=phone,
+            car_model=car_model,
+            service=service,
+            user_id=session.get('user_id')
+        )
         db.session.add(order)
         db.session.commit()
         flash('Заявка успешно отправлена.')
         return redirect(url_for('contact'))
+
     return render_template('contact.html')
 
 
@@ -201,14 +223,22 @@ def reviews():
         if not session.get('user_id'):
             flash('Чтобы оставить отзыв, сначала войдите в аккаунт.')
             return redirect(url_for('login'))
+
         author = request.form['author'].strip()
         text = request.form['text'].strip()
         rating = int(request.form['rating'])
-        review = Review(author=author, text=text, rating=rating, is_published=True)
+
+        review = Review(
+            author=author,
+            text=text,
+            rating=rating,
+            is_published=True
+        )
         db.session.add(review)
         db.session.commit()
         flash('Спасибо! Ваш отзыв опубликован.')
         return redirect(url_for('reviews'))
+
     reviews_list = Review.query.filter_by(is_published=True).order_by(Review.id.desc()).all()
     return render_template('reviews.html', reviews=reviews_list)
 
@@ -218,13 +248,16 @@ def admin_login():
     if request.method == 'POST':
         username = request.form['username'].strip()
         password = request.form['password'].strip()
+
         user = User.query.filter_by(username=username).first()
         if user and check_password_hash(user.password, password) and user.role in ['admin', 'manager']:
             session['user_id'] = user.id
             session['username'] = user.username
             session['role'] = user.role
             return redirect(url_for('admin_dashboard'))
+
         flash('Доступ разрешён только персоналу.')
+
     return render_template('admin_login.html')
 
 
@@ -242,7 +275,15 @@ def admin_dashboard():
     new = Order.query.filter_by(status='новая').count()
     done = Order.query.filter_by(status='выполнена').count()
     reviews_count = Review.query.count()
-    return render_template('admin/dashboard.html', total=total, new=new, done=done, orders=orders, reviews_count=reviews_count)
+
+    return render_template(
+        'admin/dashboard.html',
+        total=total,
+        new=new,
+        done=done,
+        orders=orders,
+        reviews_count=reviews_count
+    )
 
 
 @app.route('/admin/orders')
@@ -274,17 +315,21 @@ def admin_order_delete(id):
 @manager_required
 def admin_prices():
     global PRICES
+
     if request.method == 'POST':
         services = request.form.getlist('service')
         prices_list = request.form.getlist('price')
         times = request.form.getlist('time')
+
         count = min(len(services), len(prices_list), len(times), len(PRICES))
         for i in range(count):
             PRICES[i]['service'] = services[i]
             PRICES[i]['price'] = prices_list[i]
             PRICES[i]['time'] = times[i]
+
         flash('Прайс успешно обновлён.')
         return redirect(url_for('admin_prices'))
+
     return render_template('admin/prices.html', prices=PRICES)
 
 
@@ -330,21 +375,19 @@ def admin_user_role(id):
     return redirect(url_for('admin_users'))
 
 
-def init_db():
-    with app.app_context():
-        db.create_all()
-        if not User.query.filter_by(username='admin').first():
-            admin_user = User(username='admin', password=generate_password_hash('admin123'), role='admin')
-            db.session.add(admin_user)
-            db.session.commit()
-            print('Создан админ: логин admin, пароль admin123')
+with app.app_context():
+    db.create_all()
 
+    if not User.query.filter_by(username='admin').first():
+        admin_user = User(
+            username='admin',
+            password=generate_password_hash('admin123'),
+            role='admin'
+        )
+        db.session.add(admin_user)
+        db.session.commit()
+        print('Создан админ: логин admin, пароль admin123')
 
-init_db()
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=80)
-''')
-open('output/app_fixed.py','w',encoding='utf-8').write(code)
-open('output/app_fixed.txt','w',encoding='utf-8').write(code)
-print('saved')
