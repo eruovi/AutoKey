@@ -1,0 +1,139 @@
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: Arial, sans-serif; background: #f5f5f5; color: #333; }
+
+/* Шапка */
+.header { background: #1a1a2e; color: white; }
+.header h1 { font-size: 26px; }
+.subtitle { color: #aaa; font-size: 14px; margin: 5px 0; }
+.phone-btn {
+    display: inline-block; background: #e94560; color: white;
+    padding: 8px 25px; border-radius: 25px; text-decoration: none;
+    font-size: 18px; font-weight: bold; margin: 8px 0;
+}
+.header nav a {
+    color: white; text-decoration: none; margin: 0 12px;
+    font-size: 15px; padding: 4px 8px; border-radius: 5px;
+    transition: background 0.3s;
+}
+.header nav a:hover { background: #e94560; }
+
+/* Баннер */
+.hero {
+    background: linear-gradient(135deg, #1a1a2e, #e94560);
+    color: white; border-radius: 12px;
+}
+.hero h2 { font-size: 28px; margin-bottom: 10px; }
+.hero p { font-size: 16px; margin-bottom: 20px; color: #eee; }
+.btn-red {
+    background: white; color: #e94560; padding: 12px 28px;
+    border-radius: 25px; text-decoration: none; font-weight: bold;
+    font-size: 15px; transition: all 0.3s;
+}
+.btn-red:hover { background: #e94560; color: white; }
+.btn-white {
+    background: transparent; color: white; padding: 12px 28px;
+    border-radius: 25px; text-decoration: none; font-weight: bold;
+    font-size: 15px; border: 2px solid white; transition: all 0.3s;
+}
+.btn-white:hover { background: white; color: #e94560; }
+
+/* Карточки услуг */
+.service-card {
+    background: white;
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.12);
+    transition: transform 0.3s, box-shadow 0.3s;
+    height: 100%;
+}
+.service-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 12px 30px rgba(0,0,0,0.2);
+}
+.service-card img {
+    width: 100% !important;
+    height: 220px !important;
+    object-fit: cover !important;
+    object-position: center !important;
+    display: block !important;
+}
+.service-card-body { padding: 18px; }
+.service-card-body h5 {
+    font-size: 17px; font-weight: bold;
+    margin-bottom: 8px; color: #1a1a2e;
+}
+.service-card-body p {
+    font-size: 14px; color: #666;
+    margin-bottom: 12px; line-height: 1.5;
+}
+.service-card-body a {
+    color: #e94560; font-weight: bold;
+    text-decoration: none; font-size: 14px;
+}
+.service-card-body a:hover { text-decoration: underline; }
+
+/* Почему мы */
+.why-card {
+    background: white; padding: 20px; border-radius: 10px;
+    font-size: 16px; font-weight: bold;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+}
+
+/* Подвал */
+.footer { background: #1a1a2e; color: #aaa; font-size: 14px; margin-top: 40px; }
+
+/* Таблица цен */
+table { width: 100%; border-collapse: collapse; background: white; border-radius: 12px; overflow: hidden; }
+th { background: #1a1a2e; color: white; padding: 14px; }
+td { padding: 14px; border-bottom: 1px solid #eee; }
+tr:hover td { background: #f9f9f9; }
+
+/* Форма */
+form { background: white; padding: 30px; border-radius: 12px; max-width: 500px; }
+form input, form select {
+    width: 100%; padding: 12px; margin-bottom: 15px;
+    border: 2px solid #ddd; border-radius: 8px; font-size: 15px;
+}
+form input:focus, form select:focus { border-color: #e94560; outline: none; }
+form button {
+    width: 100%; padding: 14px; background: #e94560; color: white;
+    border: none; border-radius: 8px; font-size: 17px; font-weight: bold; cursor: pointer;
+}
+form button:hover { background: #c73652; }
+
+/* Галерея */
+.gallery-img {
+    width: 100% !important;
+    height: 260px !important;
+    object-fit: cover !important;
+    object-position: center !important;
+    border-radius: 12px !important;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.15) !important;
+    transition: transform 0.3s, box-shadow 0.3s;
+    cursor: pointer;
+    display: block !important;
+}
+.gallery-img:hover {
+    transform: scale(1.04);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.25) !important;
+}
+.gallery-caption {
+    text-align: center;
+    margin-top: 10px;
+    font-size: 15px;
+    font-weight: bold;
+    color: #1a1a2e;
+}/* Кнопка админки в шапке */
+.admin-btn {
+    background: #e94560 !important;
+    color: white !important;
+    padding: 5px 15px !important;
+    border-radius: 20px !important;
+    font-weight: bold !important;
+    margin-left: 10px !important;
+}
+.admin-btn:hover {
+    background: #c73652 !important;
+    color: white !important;
+}
+

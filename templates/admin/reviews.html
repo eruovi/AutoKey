@@ -1,0 +1,113 @@
+{% extends 'base.html' %}
+{% block title %}Отзывы | Админ-панель{% endblock %}
+{% block content %}
+
+<div class="admin-layout">
+    <aside class="admin-sidebar">
+        <h3 style="margin-top:0;">Админ-панель</h3>
+        <a href="{{ url_for('admin_dashboard') }}">Обзор</a>
+        <a href="{{ url_for('admin_orders') }}">Заявки</a>
+        <a href="{{ url_for('admin_prices') }}">Прайс</a>
+        <a href="{{ url_for('admin_reviews') }}">Отзывы</a>
+        <a href="{{ url_for('admin_users') }}">Пользователи</a>
+        <a href="{{ url_for('admin_logout') }}">Выйти</a>
+    </aside>
+
+    <div class="admin-main">
+        <section class="content-card">
+            <div class="section-head">
+                <h2>Управление отзывами</h2>
+                <p>Здесь можно просматривать, скрывать, публиковать и удалять отзывы клиентов.</p>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <strong>{{ reviews|length }}</strong>
+                    <p>Всего отзывов в системе</p>
+                </div>
+
+                <div class="stat-card">
+                    <strong>{{ reviews | selectattr('is_published') | list | length }}</strong>
+                    <p>Опубликовано на сайте</p>
+                </div>
+
+                <div class="stat-card">
+                    <strong>{{ reviews | rejectattr('is_published') | list | length }}</strong>
+                    <p>Скрыто модератором</p>
+                </div>
+
+                <div class="stat-card">
+                    <strong>{{ session.get('role') }}</strong>
+                    <p>Текущая роль в админке</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="table-card">
+            <div class="section-head">
+                <h2>Список отзывов</h2>
+                <p>Менеджер и администратор могут менять статус публикации, удаление доступно только администратору.</p>
+            </div>
+
+            {% if reviews %}
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Автор</th>
+                        <th>Оценка</th>
+                        <th>Текст</th>
+                        <th>Дата</th>
+                        <th>Статус</th>
+                        <th>Действия</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for review in reviews %}
+                    <tr>
+                        <td>#{{ review.id }}</td>
+                        <td>{{ review.author }}</td>
+                        <td>
+                            <span class="review-stars">
+                                {% for _ in range(review.rating) %}★{% endfor %}
+                            </span>
+                        </td>
+                        <td style="min-width: 260px;">{{ review.text }}</td>
+                        <td>{{ review.created_at }}</td>
+                        <td>
+                            {% if review.is_published %}
+                                <span class="status done">Опубликован</span>
+                            {% else %}
+                                <span class="status hidden">Скрыт</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                                <form method="POST" action="{{ url_for('admin_review_toggle', id=review.id) }}">
+                                    <button type="submit">
+                                        {% if review.is_published %}Скрыть{% else %}Опубликовать{% endif %}
+                                    </button>
+                                </form>
+
+                                {% if session.get('role') == 'admin' %}
+                                <form method="POST" action="{{ url_for('admin_review_delete', id=review.id) }}">
+                                    <button type="submit" class="btn-danger">Удалить</button>
+                                </form>
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <div class="info-card">
+                <h3>Отзывов пока нет</h3>
+                <p>Когда клиенты начнут оставлять отзывы, они появятся здесь для модерации.</p>
+            </div>
+            {% endif %}
+        </section>
+    </div>
+</div>
+
+{% endblock %}

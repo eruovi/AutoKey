@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% block title %}Цены | Автоключи 33{% endblock %}
+{% block content %}
+<section class="table-card">
+    <div class="section-head">
+        <h2>Прайс</h2>
+        <p>Окончательная стоимость зависит от марки авто, сложности и срочности выезда.</p>
+    </div>
+    <table>
+        <thead><tr><th>Услуга</th><th>Цена</th><th>Срок</th></tr></thead>
+        <tbody>
+            {% for item in prices %}
+            <tr>
+                <td>{{ item.service }}</td>
+                <td>{{ item.price }}</td>
+                <td>{{ item.time }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</section>
+{% endblock %}

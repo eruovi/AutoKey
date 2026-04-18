@@ -1,0 +1,163 @@
+{% extends 'base.html' %}
+{% block title %}Отзывы | Автоключи 33{% endblock %}
+{% block content %}
+
+<section class="hero" style="align-items: start;">
+    <div class="hero-panel">
+        <div class="hero-kicker">Отзывы клиентов • Реальный опыт • Обратная связь</div>
+        <h1>Отзывы о нашей работе</h1>
+        <p>
+            Здесь собраны отзывы клиентов, которым мы помогли с изготовлением ключей,
+            вскрытием автомобиля, ремонтом замков и программированием чипов.
+        </p>
+
+        <div class="hero-actions">
+            <a href="{{ url_for('contact') }}" class="btn btn-primary">Оставить заявку</a>
+            <a href="#review-form" class="btn btn-light">Оставить отзыв</a>
+        </div>
+
+        <div class="stats-grid" style="margin-top: 26px;">
+            <div class="stat-card">
+                <strong>{{ reviews|length }}</strong>
+                <p>Опубликованных отзывов</p>
+            </div>
+            <div class="stat-card">
+                <strong>24/7</strong>
+                <p>Работаем по срочным ситуациям</p>
+            </div>
+            <div class="stat-card">
+                <strong>Владимир</strong>
+                <p>И вся область по выезду</p>
+            </div>
+            <div class="stat-card">
+                <strong>5★</strong>
+                <p>Ставка на качество и скорость</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="content-card" id="review-form">
+        <div class="section-head">
+            <h2>Оставить отзыв</h2>
+            <p>Поделитесь впечатлением о работе мастера, скорости выезда и результате.</p>
+        </div>
+
+        {% if session.get('user_id') %}
+        <form method="POST">
+            <div class="form-grid">
+                <div class="form-group">
+                    <label class="form-label">Ваше имя</label>
+                    <input type="text" name="author" value="{{ session.get('username') }}" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Оценка</label>
+                    <select name="rating" required>
+                        <option value="5">5 — Отлично</option>
+                        <option value="4">4 — Хорошо</option>
+                        <option value="3">3 — Нормально</option>
+                        <option value="2">2 — Плохо</option>
+                        <option value="1">1 — Очень плохо</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Текст отзыва</label>
+                <textarea name="text" placeholder="Например: быстро приехали, аккуратно открыли машину, всё объяснили по цене..." required></textarea>
+            </div>
+
+            <button type="submit">Отправить отзыв</button>
+        </form>
+        {% else %}
+        <div class="info-card">
+            <h3>Нужно войти в аккаунт</h3>
+            <p>Чтобы оставить отзыв через сайт, сначала войдите в свой аккаунт.</p>
+            <div class="hero-actions" style="margin-top:16px;">
+                <a href="{{ url_for('login') }}" class="btn btn-primary">Войти</a>
+                <a href="{{ url_for('register') }}" class="btn btn-light">Регистрация</a>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</section>
+
+<section class="content-card">
+    <div class="section-head">
+        <h2>Что пишут клиенты</h2>
+        <p>Короткие отзывы о скорости выезда, качестве работ и результате.</p>
+    </div>
+
+    {% if reviews %}
+    <div class="gallery-grid">
+        {% for review in reviews %}
+        <div class="review-card">
+            <div class="review-stars">
+                {% for _ in range(review.rating) %}★{% endfor %}
+            </div>
+
+            <h3>{{ review.author }}</h3>
+            <p>{{ review.text }}</p>
+
+            <div style="margin-top: 14px; display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap; align-items:center;">
+                <span class="status done">Опубликовано</span>
+                <span style="font-size:14px; color:#9fb3c8;">{{ review.created_at }}</span>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="info-card">
+        <h3>Пока отзывов нет</h3>
+        <p>Будьте первым, кто поделится впечатлением о нашей работе.</p>
+    </div>
+    {% endif %}
+</section>
+
+<section class="content-card" style="margin-top: 24px;">
+    <div class="section-head">
+        <h2>Почему отзывы важны</h2>
+        <p>Они помогают новым клиентам понять, как проходит работа и чего ожидать.</p>
+    </div>
+
+    <div class="feature-grid">
+        <div class="feature-card">
+            <div class="feature-icon">🚗</div>
+            <h3>Реальные ситуации</h3>
+            <p>Люди чаще всего пишут о вскрытии авто, потере ключа и ремонте замков.</p>
+        </div>
+
+        <div class="feature-card">
+            <div class="feature-icon">⚡</div>
+            <h3>Скорость</h3>
+            <p>Для клиентов важно, как быстро мастер приехал и решил проблему на месте.</p>
+        </div>
+
+        <div class="feature-card">
+            <div class="feature-icon">🔒</div>
+            <h3>Аккуратность</h3>
+            <p>Отзывы показывают, что работа выполнена без лишних повреждений автомобиля.</p>
+        </div>
+
+        <div class="feature-card">
+            <div class="feature-icon">✅</div>
+            <h3>Доверие</h3>
+            <p>Хорошие отзывы помогают новым клиентам быстрее принять решение.</p>
+        </div>
+    </div>
+</section>
+
+<section class="content-card" style="margin-top: 24px;">
+    <div class="section-head">
+        <h2>Нужна помощь по автомобилю?</h2>
+        <p>Если у вас срочная ситуация с ключом или замком, оставьте заявку прямо сейчас.</p>
+    </div>
+
+    <div class="hero-actions">
+        <a href="{{ url_for('contact') }}" class="btn btn-primary">Оставить заявку</a>
+        <a href="{{ url_for('prices') }}" class="btn btn-light">Посмотреть цены</a>
+        <a href="{{ url_for('gallery') }}" class="btn btn-dark">Галерея работ</a>
+    </div>
+</section>
+
+{% endblock %}

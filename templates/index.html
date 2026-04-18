@@ -1,0 +1,228 @@
+{% extends 'base.html' %}
+{% block title %}Главная | Автоключи 33{% endblock %}
+{% block content %}
+
+<section class="hero">
+    <div class="hero-panel">
+        <div class="hero-kicker">Автоключи • Вскрытие • Чипы • Выезд 24/7</div>
+        <h1>Быстрое изготовление автоключей и помощь с замками во Владимире</h1>
+        <p>
+            Делаем дубликаты ключей, открываем автомобили без повреждений, ремонтируем замки
+            и программируем чип-ключи. Работаем по Владимиру и области с быстрым выездом.
+        </p>
+
+        <div class="hero-actions">
+            <a href="{{ url_for('contact') }}" class="btn btn-primary">Оставить заявку</a>
+            <a href="{{ url_for('gallery') }}" class="btn btn-light">Посмотреть работы</a>
+        </div>
+
+        <div class="stats-grid" style="margin-top: 26px;">
+            <div class="stat-card">
+                <strong>24/7</strong>
+                <p>Выезд мастера в любое время суток</p>
+            </div>
+            <div class="stat-card">
+                <strong>15–30 мин</strong>
+                <p>Среднее время прибытия по городу</p>
+            </div>
+            <div class="stat-card">
+                <strong>Все марки</strong>
+                <p>Работаем с большинством авто</p>
+            </div>
+            <div class="stat-card">
+                <strong>Без повреждений</strong>
+                <p>Аккуратная работа с авто и замками</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="hero-image-card">
+        <img src="{{ url_for('static', filename='img/key.jpg') }}" alt="Изготовление автоключей" class="hero-image">
+    </div>
+</section>
+
+<section class="content-card">
+    <div class="section-head">
+        <h2>Почему выбирают нас</h2>
+        <p>Чёткая работа, понятные цены и быстрый выезд без лишней волокиты.</p>
+    </div>
+
+    <div class="feature-grid">
+        <div class="feature-card">
+            <div class="feature-icon">⚡</div>
+            <h3>Быстрый выезд</h3>
+            <p>Оперативно приезжаем по Владимиру и области, чтобы не оставлять вас ждать слишком долго.</p>
+        </div>
+
+        <div class="feature-card">
+            <div class="feature-icon">🔑</div>
+            <h3>Ключи любой сложности</h3>
+            <p>Изготавливаем обычные, выкидные, чип-ключи и помогаем даже при полной утере.</p>
+        </div>
+
+        <div class="feature-card">
+            <div class="feature-icon">🛡️</div>
+            <h3>Аккуратная работа</h3>
+            <p>Открываем автомобиль без лишних повреждений и бережно работаем с замками.</p>
+        </div>
+
+        <div class="feature-card">
+            <div class="feature-icon">💬</div>
+            <h3>Понятная консультация</h3>
+            <p>Сразу объясняем порядок работ, сроки и ориентир по стоимости без путаницы.</p>
+        </div>
+    </div>
+</section>
+
+<section class="content-card" style="margin-top: 24px;">
+    <div class="section-head">
+        <h2>Основные услуги</h2>
+        <p>Помогаем в самых частых ситуациях, когда нужен ключ, вскрытие или ремонт замка.</p>
+    </div>
+
+    <div class="feature-grid">
+        <div class="feature-card">
+            <div class="feature-icon">🔧</div>
+            <h3>Изготовление ключей</h3>
+            <p>Дубликаты по образцу, замку или при полной утере ключей.</p>
+        </div>
+
+        <div class="feature-card">
+            <div class="feature-icon">🚗</div>
+            <h3>Аварийное вскрытие</h3>
+            <p>Открытие автомобиля без повреждения двери, кузова и замка.</p>
+        </div>
+
+        <div class="feature-card">
+            <div class="feature-icon">🧰</div>
+            <h3>Ремонт замков</h3>
+            <p>Ремонт дверных замков, багажника и замка зажигания.</p>
+        </div>
+
+        <div class="feature-card">
+            <div class="feature-icon">📡</div>
+            <h3>Программирование чипов</h3>
+            <p>Привязка брелоков, чип-ключей и иммобилайзеров.</p>
+        </div>
+    </div>
+</section>
+
+<section class="content-card" style="margin-top: 24px;">
+    <div class="section-head">
+        <h2>Как мы работаем</h2>
+        <p>Простая схема — быстро приняли заявку, приехали и решили проблему на месте.</p>
+    </div>
+
+    <div class="feature-grid">
+        <div class="feature-card">
+            <div class="feature-icon">1</div>
+            <h3>Оставляете заявку</h3>
+            <p>Пишите или звоните, кратко описываете проблему и автомобиль.</p>
+        </div>
+
+        <div class="feature-card">
+            <div class="feature-icon">2</div>
+            <h3>Согласовываем детали</h3>
+            <p>Уточняем адрес, модель авто, примерную стоимость и время приезда.</p>
+        </div>
+
+        <div class="feature-card">
+            <div class="feature-icon">3</div>
+            <h3>Выезд мастера</h3>
+            <p>Мастер приезжает с нужным инструментом и оборудованием.</p>
+        </div>
+
+        <div class="feature-card">
+            <div class="feature-icon">4</div>
+            <h3>Решаем задачу</h3>
+            <p>Открываем авто, делаем ключ, ремонтируем замок или прописываем чип.</p>
+        </div>
+    </div>
+</section>
+
+<section class="content-card" style="margin-top: 24px;">
+    <div class="section-head">
+        <h2>Фото работ</h2>
+        <p>Несколько направлений, с которыми мы работаем каждый день.</p>
+    </div>
+
+    <div class="gallery-grid">
+        <div class="gallery-card">
+            <img src="{{ url_for('static', filename='img/key.jpg') }}" alt="Изготовление автоключей">
+            <div class="gallery-card-body">
+                <h3>Изготовление ключей</h3>
+                <p>Новые ключи, дубликаты и восстановление при потере.</p>
+            </div>
+        </div>
+
+        <div class="gallery-card">
+            <img src="{{ url_for('static', filename='img/car.jpg') }}" alt="Вскрытие автомобиля">
+            <div class="gallery-card-body">
+                <h3>Вскрытие автомобиля</h3>
+                <p>Помогаем открыть машину быстро и аккуратно.</p>
+            </div>
+        </div>
+
+        <div class="gallery-card">
+            <img src="{{ url_for('static', filename='img/lock.jpg') }}" alt="Ремонт замков">
+            <div class="gallery-card-body">
+                <h3>Ремонт замков</h3>
+                <p>Восстанавливаем рабочее состояние замков и механизмов.</p>
+            </div>
+        </div>
+
+        <div class="gallery-card">
+            <img src="{{ url_for('static', filename='img/chip.jpg') }}" alt="Программирование чипов">
+            <div class="gallery-card-body">
+                <h3>Программирование чипов</h3>
+                <p>Прописываем и настраиваем современные чип-ключи.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="content-card" style="margin-top: 24px;">
+    <div class="section-head">
+        <h2>Отзывы клиентов</h2>
+        <p>Свежие отзывы клиентов о нашей работе.</p>
+    </div>
+
+    {% if reviews %}
+    <div class="reviews-grid">
+        {% for review in reviews %}
+        <div class="review-card">
+            <div class="review-stars">
+                {% for _ in range(review.rating) %}★{% endfor %}
+            </div>
+            <h3>{{ review.author }}</h3>
+            <p>{{ review.text }}</p>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+        <div class="info-card">
+            <h3>Пока отзывов немного</h3>
+            <p>Будьте первым, кто оставит отзыв о нашей работе через сайт.</p>
+        </div>
+    {% endif %}
+
+    <div style="margin-top: 18px; display: flex; gap: 12px; flex-wrap: wrap;">
+        <a href="{{ url_for('reviews') }}" class="btn btn-primary">Все отзывы</a>
+        <a href="{{ url_for('contact') }}" class="btn btn-light">Оставить заявку</a>
+    </div>
+</section>
+
+<section class="content-card" style="margin-top: 24px;">
+    <div class="section-head">
+        <h2>Нужна помощь прямо сейчас?</h2>
+        <p>Оставьте заявку, и мы свяжемся с вами для уточнения деталей и быстрого выезда.</p>
+    </div>
+
+    <div class="hero-actions">
+        <a href="{{ url_for('contact') }}" class="btn btn-primary">Оставить заявку</a>
+        <a href="{{ url_for('contacts') }}" class="btn btn-light">Контакты</a>
+        <a href="{{ url_for('prices') }}" class="btn btn-dark">Посмотреть цены</a>
+    </div>
+</section>
+
+{% endblock %}

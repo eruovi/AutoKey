@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Оставить заявку</h2>
+<form method="POST">
+    <input type="text" name="name" placeholder="Ваше имя" required>
+    <input type="tel" name="phone" placeholder="+7 (XXX) XXX-XX-XX" required>
+    <input type="text" name="car_model" placeholder="Марка и модель авто">
+    <select name="service">
+        <option>Изготовление ключа</option>
+        <option>Вскрытие автомобиля</option>
+        <option>Ремонт замка зажигания</option>
+        <option>Программирование чип-ключа</option>
+    </select>
+    <button type="submit">Отправить заявку</button>
+</form>
+{% endblock %}

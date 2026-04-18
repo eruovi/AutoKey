@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% block title %}Галерея | Автоключи 33{% endblock %}
+{% block content %}
+<section class="content-card">
+    <div class="section-head">
+        <h2>Галерея работ</h2>
+        <p>Примеры работ по изготовлению ключей, вскрытию автомобилей и ремонту замков.</p>
+    </div>
+
+    <div class="gallery-grid">
+        <div class="gallery-card">
+            <img src="{{ url_for('static', filename='img/key.jpg') }}" alt="Изготовление автоключей">
+            <div class="gallery-card-body">
+                <h3>Изготовление автоключей</h3>
+                <p>Дубликаты, восстановление и работа с современными ключами.</p>
+            </div>
+        </div>
+
+        <div class="gallery-card">
+            <img src="{{ url_for('static', filename='img/car.jpg') }}" alt="Вскрытие автомобиля">
+            <div class="gallery-card-body">
+                <h3>Вскрытие автомобиля</h3>
+                <p>Аккуратное вскрытие без повреждений и лишних рисков.</p>
+            </div>
+        </div>
+
+        <div class="gallery-card">
+            <img src="{{ url_for('static', filename='img/lock.jpg') }}" alt="Ремонт автомобильного замка">
+            <div class="gallery-card-body">
+                <h3>Ремонт замков</h3>
+                <p>Восстановление механики замка, личинок и зажигания.</p>
+            </div>
+        </div>
+
+        <div class="gallery-card">
+            <img src="{{ url_for('static', filename='img/chip.jpg') }}" alt="Программирование чип-ключей">
+            <div class="gallery-card-body">
+                <h3>Программирование чипов</h3>
+                <p>Привязка чип-ключей, брелоков и иммобилайзеров.</p>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

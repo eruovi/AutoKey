@@ -1,0 +1,170 @@
+{% extends 'base.html' %}
+{% block title %}Обзор | Админ-панель{% endblock %}
+{% block content %}
+
+<div class="admin-layout">
+    <aside class="admin-sidebar">
+        <h3 style="margin-top:0;">Админ-панель</h3>
+        <a href="{{ url_for('admin_dashboard') }}">Обзор</a>
+        <a href="{{ url_for('admin_orders') }}">Заявки</a>
+        <a href="{{ url_for('admin_prices') }}">Прайс</a>
+        <a href="{{ url_for('admin_reviews') }}">Отзывы</a>
+        <a href="{{ url_for('admin_users') }}">Пользователи</a>
+        <a href="{{ url_for('admin_logout') }}">Выйти</a>
+    </aside>
+
+    <div class="admin-main">
+        <section class="content-card">
+            <div class="section-head">
+                <h2>Обзор системы</h2>
+                <p>Ключевые показатели, быстрые действия и последние заявки в одной панели.</p>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <h3>Всего заявок</h3>
+                    <strong>{{ total }}</strong>
+                    <p>Общее количество заявок в базе.</p>
+                </div>
+
+                <div class="stat-card">
+                    <h3>Новые заявки</h3>
+                    <strong>{{ new }}</strong>
+                    <p>Требуют внимания в первую очередь.</p>
+                </div>
+
+                <div class="stat-card">
+                    <h3>Выполнено</h3>
+                    <strong>{{ done }}</strong>
+                    <p>Завершённые обращения клиентов.</p>
+                </div>
+
+                <div class="stat-card">
+                    <h3>Отзывы</h3>
+                    <strong>{{ reviews_count }}</strong>
+                    <p>Всего отзывов в системе.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="content-card">
+            <div class="section-head">
+                <h2>Быстрые действия</h2>
+                <p>Переходы в основные разделы админки без лишних кликов.</p>
+            </div>
+
+            <div class="feature-grid">
+                <a href="{{ url_for('admin_orders') }}" class="feature-card">
+                    <div class="feature-icon">📦</div>
+                    <h3>Заявки</h3>
+                    <p>Посмотреть новые обращения, изменить статус и отследить работу по клиентам.</p>
+                </a>
+
+                <a href="{{ url_for('admin_prices') }}" class="feature-card">
+                    <div class="feature-icon">💳</div>
+                    <h3>Прайс</h3>
+                    <p>Обновить цены и время выполнения услуг на сайте.</p>
+                </a>
+
+                <a href="{{ url_for('admin_reviews') }}" class="feature-card">
+                    <div class="feature-icon">⭐</div>
+                    <h3>Отзывы</h3>
+                    <p>Опубликовать, скрыть или удалить отзывы клиентов.</p>
+                </a>
+
+                <a href="{{ url_for('admin_users') }}" class="feature-card">
+                    <div class="feature-icon">👤</div>
+                    <h3>Пользователи</h3>
+                    <p>Проверить роли аккаунтов и при необходимости изменить права доступа.</p>
+                </a>
+            </div>
+        </section>
+
+        <section class="table-card">
+            <div class="section-head">
+                <h2>Последние заявки</h2>
+                <p>Свежие обращения клиентов, которые недавно поступили через сайт.</p>
+            </div>
+
+            {% if orders %}
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Имя</th>
+                        <th>Телефон</th>
+                        <th>Автомобиль</th>
+                        <th>Услуга</th>
+                        <th>Статус</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for order in orders[:10] %}
+                    <tr>
+                        <td>#{{ order.id }}</td>
+                        <td>{{ order.name }}</td>
+                        <td>{{ order.phone }}</td>
+                        <td>{{ order.car_model }}</td>
+                        <td>{{ order.service }}</td>
+                        <td>
+                            {% if order.status == 'выполнена' %}
+                                <span class="status done">{{ order.status }}</span>
+                            {% elif order.status == 'в работе' %}
+                                <span class="status">{{ order.status }}</span>
+                            {% else %}
+                                <span class="status hidden">{{ order.status }}</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+            <div style="margin-top: 18px; display:flex; gap:12px; flex-wrap:wrap;">
+                <a href="{{ url_for('admin_orders') }}" class="btn btn-primary">Открыть все заявки</a>
+                <a href="{{ url_for('admin_reviews') }}" class="btn btn-light">Перейти к отзывам</a>
+            </div>
+            {% else %}
+            <div class="info-card">
+                <h3>Заявок пока нет</h3>
+                <p>Когда клиенты начнут отправлять обращения, они появятся здесь.</p>
+            </div>
+            {% endif %}
+        </section>
+
+        <section class="content-card">
+            <div class="section-head">
+                <h2>Фокус на сегодня</h2>
+                <p>Небольшой ориентир, чтобы менеджеру было проще понять, с чего начинать работу.</p>
+            </div>
+
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">1</div>
+                    <h3>Проверить новые заявки</h3>
+                    <p>Сначала обработай все свежие обращения, чтобы не терять горячих клиентов.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">2</div>
+                    <h3>Обновить статусы</h3>
+                    <p>Держи статусы заявок актуальными, чтобы было понятно, что в работе, а что завершено.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">3</div>
+                    <h3>Просмотреть отзывы</h3>
+                    <p>Публикуй хорошие отзывы и убирай лишний мусор, чтобы сайт выглядел живым и надёжным.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">4</div>
+                    <h3>Проверить прайс</h3>
+                    <p>Если менялись цены или сроки, быстро обнови информацию на сайте.</p>
+                </div>
+            </div>
+        </section>
+    </div>
+</div>
+
+{% endblock %}

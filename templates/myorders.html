@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+{% block title %}Мои заявки | Автоключи 33{% endblock %}
+{% block content %}
+
+<section class="content-card">
+    <div class="section-head">
+        <h2>Мои заявки</h2>
+        <p>Здесь отображаются все заявки, которые вы отправляли через сайт.</p>
+    </div>
+
+    {% if orders %}
+    <div class="table-card" style="padding: 0;">
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Имя</th>
+                    <th>Телефон</th>
+                    <th>Автомобиль</th>
+                    <th>Услуга</th>
+                    <th>Статус</th>
+                    <th>Дата</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for order in orders %}
+                <tr>
+                    <td>#{{ order.id }}</td>
+                    <td>{{ order.name }}</td>
+                    <td>{{ order.phone }}</td>
+                    <td>{{ order.car_model }}</td>
+                    <td>{{ order.service }}</td>
+                    <td>
+                        {% if order.status == 'выполнена' %}
+                            <span class="status done">{{ order.status }}</span>
+                        {% elif order.status == 'в работе' %}
+                            <span class="status">{{ order.status }}</span>
+                        {% else %}
+                            <span class="status hidden">{{ order.status }}</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ order.created_at }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="info-card">
+        <h3>Заявок пока нет</h3>
+        <p>Когда вы отправите первую заявку через сайт, она появится здесь.</p>
+    </div>
+    {% endif %}
+</section>
+
+{% endblock %}

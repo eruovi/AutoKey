@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% block title %}Контакты | Автоключи 33{% endblock %}
+{% block content %}
+<section class="content-card">
+    <div class="section-head">
+        <h2>Контакты</h2>
+        <p>Свяжитесь с нами удобным способом или оставьте заявку через сайт.</p>
+    </div>
+    <div class="feature-grid">
+        <div class="info-card"><h3>Адрес</h3><p>г. Владимир, ул. Большая Московская, 19А</p></div>
+        <div class="info-card"><h3>График</h3><p>Ежедневно: 10:00 — 20:00<br>Вскрытие авто: 24/7</p></div>
+        <div class="info-card"><h3>Выезд</h3><p>По Владимиру и Владимирской области</p></div>
+        <div class="info-card"><h3>Заявка</h3><p><a href="{{ url_for('contact') }}" class="btn btn-primary">Оставить заявку</a></p></div>
+    </div>
+</section>
+{% endblock %}
