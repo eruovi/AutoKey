@@ -984,4 +984,70 @@ tr:hover td {
         opacity: 1 !important;
         transform: none !important;
     }
+    .table-wrap {
+    width: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+    border-radius: 20px;
+}
+
+.table-wrap table {
+    width: 100%;
+    min-width: 980px;
+    border-collapse: collapse;
+}
+
+.table-wrap th,
+.table-wrap td {
+    vertical-align: top;
+}
+
+.text-cell {
+    min-width: 260px;
+    white-space: normal;
+    word-break: break-word;
+}
+
+.date-cell {
+    min-width: 130px;
+    white-space: normal;
+}
+
+.status-cell {
+    white-space: nowrap;
+}
+
+.actions-cell {
+    white-space: nowrap;
+    width: 1%;
+}
+
+.actions-cell form,
+.actions-cell a,
+.actions-cell button {
+    display: inline-flex;
+    margin-right: 8px;
+    margin-bottom: 8px;
+}
+
+.actions-cell form {
+    display: inline-block;
+}
+
+.actions-cell .btn,
+.actions-cell button {
+    white-space: nowrap;
+}
+
+@media (max-width: 760px) {
+    .table-wrap {
+        margin-inline: -4px;
+        padding-inline: 4px;
+    }
+
+    .table-wrap table {
+        min-width: 860px;
+    }
+}
 }
