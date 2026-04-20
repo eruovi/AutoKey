@@ -36,7 +36,6 @@
         }
 
         * { box-sizing: border-box; }
-
         html { scroll-behavior: smooth; }
 
         body {
@@ -115,7 +114,7 @@
         .navbar {
             position: sticky;
             top: 0;
-            z-index: 100;
+            z-index: 1000;
             background: rgba(7, 17, 31, 0.62);
             backdrop-filter: blur(18px);
             border-bottom: 1px solid rgba(255,255,255,.08);
@@ -152,6 +151,25 @@
                 0 12px 26px rgba(21, 209, 197, 0.28),
                 inset 0 1px 0 rgba(255,255,255,.25);
             animation: pulseMark 3.6s ease-in-out infinite;
+        }
+
+        .menu-toggle {
+            display: none;
+            width: 48px;
+            height: 48px;
+            border-radius: 14px;
+            border: 1px solid rgba(255,255,255,.12);
+            background: rgba(255,255,255,.08);
+            color: #fff;
+            font-size: 22px;
+            cursor: pointer;
+            padding: 0;
+            flex-shrink: 0;
+        }
+
+        .menu-toggle:hover {
+            background: rgba(255,255,255,.14);
+            transform: translateY(-1px);
         }
 
         .nav-links, .nav-actions {
@@ -699,13 +717,77 @@
         }
 
         @media (max-width: 760px) {
-            .nav-inner {
-                flex-direction: column;
-                align-items: flex-start;
+            .topbar {
+                padding: 8px 14px;
+                font-size: 12px;
             }
 
-            .nav-links, .nav-actions, .gallery-grid {
+            .topbar-inner {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 4px;
+            }
+
+            .nav-inner {
+                display: grid;
+                grid-template-columns: 1fr auto;
+                align-items: center;
+                gap: 14px;
+                padding: 14px;
+            }
+
+            .brand {
+                min-width: 0;
+                font-size: 16px;
+            }
+
+            .brand span:last-child {
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+
+            .brand-mark {
+                width: 42px;
+                height: 42px;
+                border-radius: 14px;
+                font-size: 20px;
+            }
+
+            .menu-toggle {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .nav-links,
+            .nav-actions {
+                display: none;
                 width: 100%;
+                grid-column: 1 / -1;
+                flex-direction: column;
+                align-items: stretch;
+                gap: 12px;
+                padding-top: 10px;
+                animation: fadeUp .25s ease;
+            }
+
+            .nav-links.open,
+            .nav-actions.open {
+                display: flex;
+            }
+
+            .nav-links a,
+            .btn,
+            .nav-actions a,
+            .nav-actions .user-badge,
+            button {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .user-badge {
+                text-align: center;
             }
 
             .hero-panel, .hero-image-card, .content-card, .table-card, .auth-card, .info-card, .gallery-card {
@@ -718,16 +800,6 @@
 
             .page-shell {
                 padding: 20px 14px 40px;
-            }
-
-            .nav-links a, .btn, button {
-                width: 100%;
-                justify-content: center;
-            }
-
-            .user-badge {
-                width: 100%;
-                text-align: center;
             }
 
             .hero-image {
@@ -770,7 +842,11 @@
                 <span>Автоключи 33</span>
             </a>
 
-            <nav class="nav-links">
+            <button class="menu-toggle" type="button" aria-label="Открыть меню" aria-expanded="false">
+                ☰
+            </button>
+
+            <nav class="nav-links" id="mobileMenu">
                 <a href="{{ url_for('index') }}">Главная</a>
                 <a href="{{ url_for('services') }}">Услуги</a>
                 <a href="{{ url_for('prices') }}">Цены</a>
@@ -780,7 +856,7 @@
                 <a href="{{ url_for('contact') }}">Заявка</a>
             </nav>
 
-            <div class="nav-actions">
+            <div class="nav-actions" id="mobileActions">
                 {% if session.get('user_id') %}
                     <div class="user-badge">{{ session.get('username') }}</div>
                     {% if session.get('role') in ['admin', 'manager'] %}
@@ -830,6 +906,40 @@
         });
 
         revealItems.forEach(item => observer.observe(item));
+
+        const menuToggle = document.querySelector('.menu-toggle');
+        const mobileMenu = document.querySelector('.nav-links');
+        const mobileActions = document.querySelector('.nav-actions');
+        const mobileMenuLinks = document.querySelectorAll('.nav-links a, .nav-actions a');
+
+        if (menuToggle && mobileMenu && mobileActions) {
+            menuToggle.addEventListener('click', () => {
+                const isOpen = mobileMenu.classList.toggle('open');
+                mobileActions.classList.toggle('open');
+                menuToggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+                menuToggle.textContent = isOpen ? '✕' : '☰';
+            });
+
+            mobileMenuLinks.forEach(link => {
+                link.addEventListener('click', () => {
+                    if (window.innerWidth <= 760) {
+                        mobileMenu.classList.remove('open');
+                        mobileActions.classList.remove('open');
+                        menuToggle.setAttribute('aria-expanded', 'false');
+                        menuToggle.textContent = '☰';
+                    }
+                });
+            });
+
+            window.addEventListener('resize', () => {
+                if (window.innerWidth > 760) {
+                    mobileMenu.classList.remove('open');
+                    mobileActions.classList.remove('open');
+                    menuToggle.setAttribute('aria-expanded', 'false');
+                    menuToggle.textContent = '☰';
+                }
+            });
+        }
     </script>
 </body>
 </html>
