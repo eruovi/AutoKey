@@ -16,7 +16,7 @@
             <a href="{{ url_for('gallery') }}" class="btn btn-light">Посмотреть работы</a>
         </div>
 
-        <div class="stats-grid" style="margin-top: 26px;">
+        <div class="stats-grid stats-grid-hero">
             <div class="stat-card">
                 <strong>24/7</strong>
                 <p>Выезд мастера в любое время суток</p>
@@ -37,7 +37,7 @@
     </div>
 
     <div class="hero-image-card">
-        <img src="{{ url_for('static', filename='img/key.jpg') }}" alt="Изготовление автоключей" class="hero-image">
+        <img src="{{ url_for('static', filename='img/key.jpg') }}" alt="Изготовление автоключей" class="hero-image" width="1200" height="900">
     </div>
 </section>
 
@@ -148,7 +148,7 @@
 
     <div class="gallery-grid">
         <div class="gallery-card">
-            <img src="{{ url_for('static', filename='img/key.jpg') }}" alt="Изготовление автоключей">
+            <img src="{{ url_for('static', filename='img/key.jpg') }}" alt="Изготовление автоключей" width="1200" height="900" loading="lazy" decoding="async">
             <div class="gallery-card-body">
                 <h3>Изготовление ключей</h3>
                 <p>Новые ключи, дубликаты и восстановление при потере.</p>
@@ -156,7 +156,7 @@
         </div>
 
         <div class="gallery-card">
-            <img src="{{ url_for('static', filename='img/car.jpg') }}" alt="Вскрытие автомобиля">
+            <img src="{{ url_for('static', filename='img/car.jpg') }}" alt="Вскрытие автомобиля" width="1200" height="900" loading="lazy" decoding="async">
             <div class="gallery-card-body">
                 <h3>Вскрытие автомобиля</h3>
                 <p>Помогаем открыть машину быстро и аккуратно.</p>
@@ -164,7 +164,7 @@
         </div>
 
         <div class="gallery-card">
-            <img src="{{ url_for('static', filename='img/lock.jpg') }}" alt="Ремонт замков">
+            <img src="{{ url_for('static', filename='img/lock.jpg') }}" alt="Ремонт замков" width="1200" height="900" loading="lazy" decoding="async">
             <div class="gallery-card-body">
                 <h3>Ремонт замков</h3>
                 <p>Восстанавливаем рабочее состояние замков и механизмов.</p>
@@ -172,7 +172,7 @@
         </div>
 
         <div class="gallery-card">
-            <img src="{{ url_for('static', filename='img/chip.jpg') }}" alt="Программирование чипов">
+            <img src="{{ url_for('static', filename='img/chip.jpg') }}" alt="Программирование чипов" width="1200" height="900" loading="lazy" decoding="async">
             <div class="gallery-card-body">
                 <h3>Программирование чипов</h3>
                 <p>Прописываем и настраиваем современные чип-ключи.</p>

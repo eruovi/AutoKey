@@ -1,16 +1,117 @@
 {% extends 'base.html' %}
 {% block title %}Услуги | Автоключи 33{% endblock %}
 {% block content %}
+
 <section class="content-card">
     <div class="section-head">
         <h2>Услуги</h2>
         <p>Работаем по Владимиру и области с выездом и диагностикой по месту.</p>
     </div>
+
     <div class="feature-grid">
-        <div class="feature-card"><div class="feature-icon">🔑</div><h3>Изготовление ключей</h3><p>Изготовим ключ любой сложности по замку или образцу.</p></div>
-        <div class="feature-card"><div class="feature-icon">🚗</div><h3>Аварийное вскрытие</h3><p>Вскрытие авто без повреждений с быстрым выездом.</p></div>
-        <div class="feature-card"><div class="feature-icon">🔧</div><h3>Ремонт замков</h3><p>Ремонт и замена дверных замков и замка зажигания.</p></div>
-        <div class="feature-card"><div class="feature-icon">📡</div><h3>Программирование</h3><p>Прописка чип-ключей и иммобилайзеров всех популярных марок.</p></div>
+        <div class="feature-card">
+            <div class="feature-icon">🔑</div>
+            <h3>Изготовление ключей</h3>
+            <p>Изготовим ключ любой сложности по замку или образцу.</p>
+        </div>
+
+        <div class="feature-card">
+            <div class="feature-icon">🚗</div>
+            <h3>Аварийное вскрытие</h3>
+            <p>Вскрытие авто без повреждений с быстрым выездом.</p>
+        </div>
+
+        <div class="feature-card">
+            <div class="feature-icon">🔧</div>
+            <h3>Ремонт замков</h3>
+            <p>Ремонт и замена дверных замков и замка зажигания.</p>
+        </div>
+
+        <div class="feature-card">
+            <div class="feature-icon">📡</div>
+            <h3>Программирование</h3>
+            <p>Прописка чип-ключей и иммобилайзеров всех популярных марок.</p>
+        </div>
     </div>
 </section>
+
+<section class="content-card" style="margin-top: 24px;">
+    <div class="section-head">
+        <h2>Что мы делаем на выезде</h2>
+        <p>Можно решить проблему на месте без эвакуации и долгого ожидания.</p>
+    </div>
+
+    <div class="feature-grid">
+        <div class="feature-card">
+            <div class="feature-icon">⚡</div>
+            <h3>Быстрая помощь</h3>
+            <p>Приезжаем по Владимиру и области в кратчайшее время.</p>
+        </div>
+
+        <div class="feature-card">
+            <div class="feature-icon">🛠️</div>
+            <h3>Диагностика на месте</h3>
+            <p>Оцениваем ситуацию сразу на адресе и предлагаем решение без лишних расходов.</p>
+        </div>
+
+        <div class="feature-card">
+            <div class="feature-icon">🛡️</div>
+            <h3>Без лишних повреждений</h3>
+            <p>Стараемся открыть, отремонтировать или восстановить всё аккуратно.</p>
+        </div>
+
+        <div class="feature-card">
+            <div class="feature-icon">💬</div>
+            <h3>Понятная цена</h3>
+            <p>Объясняем стоимость до начала работ, без скрытых доплат.</p>
+        </div>
+    </div>
+</section>
+
+<section class="content-card" style="margin-top: 24px;">
+    <div class="section-head">
+        <h2>Когда обращаться</h2>
+        <p>Собрали частые ситуации, с которыми к нам обращаются чаще всего.</p>
+    </div>
+
+    <div class="feature-grid">
+        <div class="feature-card">
+            <div class="feature-icon">1</div>
+            <h3>Потеряли ключи</h3>
+            <p>Сделаем новый ключ или организуем восстановление по замку.</p>
+        </div>
+
+        <div class="feature-card">
+            <div class="feature-icon">2</div>
+            <h3>Захлопнули авто</h3>
+            <p>Поможем открыть автомобиль без повреждений и лишнего стресса.</p>
+        </div>
+
+        <div class="feature-card">
+            <div class="feature-icon">3</div>
+            <h3>Не работает замок</h3>
+            <p>Проверим механизм и выполним ремонт или замену.</p>
+        </div>
+
+        <div class="feature-card">
+            <div class="feature-icon">4</div>
+            <h3>Нужен чип</h3>
+            <p>Пропишем чип-ключи и иммобилайзеры для разных марок.</p>
+        </div>
+    </div>
+</section>
+
+<section class="content-card" style="margin-top: 24px;">
+    <div class="section-head">
+        <h2>Заказать услугу</h2>
+        <p>Оставьте заявку, и мы свяжемся с вами для уточнения деталей.</p>
+    </div>
+
+    <div class="hero-actions">
+        <a href="{{ url_for('contact') }}" class="btn btn-primary">Оставить заявку</a>
+        <a href="{{ url_for('prices') }}" class="btn btn-light">Посмотреть цены</a>
+        <a href="{{ url_for('contacts') }}" class="btn btn-dark">Контакты</a>
+    </div>
+</section>
+
 {% endblock %}
