@@ -5,31 +5,18 @@ from werkzeug.security import generate_password_hash, check_password_hash
 import os
 import re
 
-
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 TEMPLATES_DIR = os.path.join(BASE_DIR, 'templates')
 STATIC_DIR = os.path.join(BASE_DIR, 'static')
 
-
 app = Flask(__name__, template_folder=TEMPLATES_DIR, static_folder=STATIC_DIR)
 app.secret_key = 'autokey-secret2026'
-
 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(BASE_DIR, 'orders.db')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {'pool_pre_ping': True}
 
-
 db = SQLAlchemy(app)
-
-
-print('BASE_DIR =', BASE_DIR)
-print('TEMPLATES_DIR =', TEMPLATES_DIR)
-print('templates exists =', os.path.exists(TEMPLATES_DIR))
-print('myorders exists =', os.path.exists(os.path.join(TEMPLATES_DIR, 'myorders.html')))
-print('admin_login exists =', os.path.exists(os.path.join(TEMPLATES_DIR, 'admin_login.html')))
-print('login exists =', os.path.exists(os.path.join(TEMPLATES_DIR, 'login.html')))
-
 
 PRICES = [
     {'service': 'Изготовление ключа', 'price': 'от 500 руб.', 'time': '30 мин'},
@@ -150,11 +137,44 @@ def login():
     return render_template('login.html')
 
 
+@app.route('/admin/login', methods=['GET', 'POST'])
+def admin_login():
+    if request.method == 'POST':
+        username = request.form['username'].strip()
+        password = request.form['password'].strip()
+
+        user = User.query.filter_by(username=username).first()
+        if user and check_password_hash(user.password, password):
+            if user.role not in ['admin', 'manager']:
+                flash('Доступ разрешён только персоналу.')
+                return render_template('admin_login.html')
+
+            session['user_id'] = user.id
+            session['username'] = user.username
+            session['role'] = user.role
+
+            if user.role == 'manager':
+                return redirect(url_for('admin_orders'))
+
+            return redirect(url_for('admin_dashboard'))
+
+        flash('Неверный логин или пароль.')
+
+    return render_template('admin_login.html')
+
+
 @app.route('/logout')
 def logout():
     session.clear()
     flash('Вы вышли из аккаунта.')
     return redirect(url_for('index'))
+
+
+@app.route('/admin/logout')
+def admin_logout():
+    session.clear()
+    flash('Вы вышли из панели персонала.')
+    return redirect(url_for('admin_login'))
 
 
 @app.route('/my-orders')
@@ -243,30 +263,6 @@ def reviews():
     return render_template('reviews.html', reviews=reviews_list)
 
 
-@app.route('/admin/login', methods=['GET', 'POST'])
-def admin_login():
-    if request.method == 'POST':
-        username = request.form['username'].strip()
-        password = request.form['password'].strip()
-
-        user = User.query.filter_by(username=username).first()
-        if user and check_password_hash(user.password, password) and user.role in ['admin', 'manager']:
-            session['user_id'] = user.id
-            session['username'] = user.username
-            session['role'] = user.role
-            return redirect(url_for('admin_dashboard'))
-
-        flash('Доступ разрешён только персоналу.')
-
-    return render_template('admin_login.html')
-
-
-@app.route('/admin/logout')
-def admin_logout():
-    session.clear()
-    return redirect(url_for('admin_login'))
-
-
 @app.route('/admin')
 @manager_required
 def admin_dashboard():
@@ -308,6 +304,7 @@ def admin_order_delete(id):
     order = Order.query.get_or_404(id)
     db.session.delete(order)
     db.session.commit()
+    flash('Заявка удалена.')
     return redirect(url_for('admin_orders'))
 
 
@@ -355,6 +352,7 @@ def admin_review_delete(id):
     review = Review.query.get_or_404(id)
     db.session.delete(review)
     db.session.commit()
+    flash('Отзыв удалён.')
     return redirect(url_for('admin_reviews'))
 
 
@@ -387,6 +385,16 @@ with app.app_context():
         db.session.add(admin_user)
         db.session.commit()
         print('Создан админ: логин admin, пароль admin123')
+
+    if not User.query.filter_by(username='manager').first():
+        manager_user = User(
+            username='manager',
+            password=generate_password_hash('manager123'),
+            role='manager'
+        )
+        db.session.add(manager_user)
+        db.session.commit()
+        print('Создан менеджер: логин manager, пароль manager123')
 
 
 if __name__ == '__main__':
