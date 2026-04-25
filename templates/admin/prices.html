@@ -1,4 +1,4 @@
-{% extends 'base.html' %}
+{% extends 'admin/base.html' %}
 {% block title %}Прайс | Админ-панель{% endblock %}
 {% block content %}
 
@@ -16,99 +16,37 @@
     <div class="admin-main">
         <section class="content-card">
             <div class="section-head">
-                <h2>Редактирование прайса</h2>
-                <p>Изменяйте услуги, стоимость и ориентировочное время выполнения прямо из админ-панели.</p>
-            </div>
-
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <strong>{{ prices|length }}</strong>
-                    <p>Позиций в прайсе</p>
-                </div>
-
-                <div class="stat-card">
-                    <strong>₽</strong>
-                    <p>Цены редактируются вручную</p>
-                </div>
-
-                <div class="stat-card">
-                    <strong>⏱</strong>
-                    <p>Можно менять время выполнения</p>
-                </div>
-
-                <div class="stat-card">
-                    <strong>{{ session.get('role') }}</strong>
-                    <p>Текущая роль в системе</p>
-                </div>
-            </div>
-        </section>
-
-        <section class="content-card">
-            <div class="section-head">
-                <h2>Форма изменения прайса</h2>
-                <p>Заполняйте поля аккуратно и в одном стиле, чтобы прайс на сайте выглядел чисто и понятно.</p>
+                <h2>Редактор прайса</h2>
+                <p>Меняй названия услуг, стоимость и примерное время выполнения в одном месте.</p>
             </div>
 
             <form method="POST" class="price-editor-form">
                 {% for item in prices %}
                 <div class="price-edit-card">
-                    <div class="form-group">
-                        <label class="form-label">Название услуги</label>
-                        <input type="text" name="service" value="{{ item.service }}" required>
-                    </div>
-
                     <div class="form-grid">
+                        <div class="form-group">
+                            <label class="form-label">Услуга</label>
+                            <input type="text" name="service" value="{{ item.service }}" required>
+                        </div>
+
                         <div class="form-group">
                             <label class="form-label">Цена</label>
                             <input type="text" name="price" value="{{ item.price }}" required>
                         </div>
+                    </div>
 
-                        <div class="form-group">
-                            <label class="form-label">Время выполнения</label>
-                            <input type="text" name="time" value="{{ item.time }}" required>
-                        </div>
+                    <div class="form-group">
+                        <label class="form-label">Время</label>
+                        <input type="text" name="time" value="{{ item.time }}" required>
                     </div>
                 </div>
                 {% endfor %}
 
                 <div class="admin-form-actions">
                     <button type="submit">Сохранить прайс</button>
-                    <a href="{{ url_for('prices') }}" class="btn btn-light">Посмотреть страницу цен</a>
+                    <a href="{{ url_for('prices') }}" class="btn btn-light">Открыть страницу цен</a>
                 </div>
             </form>
-        </section>
-
-        <section class="content-card">
-            <div class="section-head">
-                <h2>Подсказки по оформлению</h2>
-                <p>Небольшие правила, чтобы цены на сайте выглядели аккуратно и вызывали больше доверия.</p>
-            </div>
-
-            <div class="feature-grid">
-                <div class="feature-card">
-                    <div class="feature-icon">1</div>
-                    <h3>Один формат цен</h3>
-                    <p>Пиши цены единообразно, например: «от 1000 руб.» или «от 1500 руб.».</p>
-                </div>
-
-                <div class="feature-card">
-                    <div class="feature-icon">2</div>
-                    <h3>Понятные названия</h3>
-                    <p>Не перегружай названия услуг лишними словами, делай формулировки короткими и ясными.</p>
-                </div>
-
-                <div class="feature-card">
-                    <div class="feature-icon">3</div>
-                    <h3>Реальные сроки</h3>
-                    <p>Указывай примерное время честно, чтобы клиент понимал, чего ожидать.</p>
-                </div>
-
-                <div class="feature-card">
-                    <div class="feature-icon">4</div>
-                    <h3>Проверяй после сохранения</h3>
-                    <p>После обновления открой страницу цен на сайте и посмотри, как это выглядит у клиента.</p>
-                </div>
-            </div>
         </section>
     </div>
 </div>

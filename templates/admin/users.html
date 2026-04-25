@@ -1,4 +1,4 @@
-{% extends 'base.html' %}
+{% extends 'admin/base.html' %}
 {% block title %}Пользователи | Админ-панель{% endblock %}
 {% block content %}
 
@@ -16,8 +16,8 @@
     <div class="admin-main">
         <section class="content-card">
             <div class="section-head">
-                <h2>Управление пользователями</h2>
-                <p>Здесь можно смотреть список аккаунтов и менять роли пользователей в системе.</p>
+                <h2>Пользователи</h2>
+                <p>Только администратор может менять роли пользователей.</p>
             </div>
 
             <div class="stats-grid">
@@ -46,7 +46,7 @@
         <section class="table-card">
             <div class="section-head">
                 <h2>Список пользователей</h2>
-                <p>Изменение роли доступно только администратору, что соответствует логике доступа в приложении.</p>
+                <p>Изменяй роль только тем сотрудникам, которым действительно нужен доступ в админку.</p>
             </div>
 
             {% if users %}
@@ -56,9 +56,11 @@
                         <tr>
                             <th>ID</th>
                             <th>Логин</th>
-                            <th>Текущая роль</th>
-                            <th>Изменить роль</th>
-                            <th>Действие</th>
+                            <th>Имя</th>
+                            <th>Фамилия</th>
+                            <th>Email</th>
+                            <th class="role-cell">Роль</th>
+                            <th class="actions-cell">Действия</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -66,7 +68,10 @@
                         <tr>
                             <td>#{{ user.id }}</td>
                             <td class="user-name-cell">{{ user.username }}</td>
-                            <td>
+                            <td>{{ user.first_name or '-' }}</td>
+                            <td>{{ user.last_name or '-' }}</td>
+                            <td class="text-cell">{{ user.email or '-' }}</td>
+                            <td class="role-cell">
                                 {% if user.role == 'admin' %}
                                     <span class="status done">admin</span>
                                 {% elif user.role == 'manager' %}
@@ -75,17 +80,15 @@
                                     <span class="status hidden">client</span>
                                 {% endif %}
                             </td>
-                            <td class="role-cell">
-                                <form method="POST" action="{{ url_for('admin_user_role', id=user.id) }}" class="user-role-form" id="user-role-form-{{ user.id }}">
-                                    <select name="role">
+                            <td class="actions-cell">
+                                <form method="POST" action="{{ url_for('admin_user_role', id=user.id) }}" class="user-role-form">
+                                    <select name="role" required>
                                         <option value="client" {% if user.role == 'client' %}selected{% endif %}>client</option>
                                         <option value="manager" {% if user.role == 'manager' %}selected{% endif %}>manager</option>
                                         <option value="admin" {% if user.role == 'admin' %}selected{% endif %}>admin</option>
                                     </select>
+                                    <button type="submit">Сохранить роль</button>
                                 </form>
-                            </td>
-                            <td class="action-button-cell">
-                                <button type="submit" form="user-role-form-{{ user.id }}">Сохранить роль</button>
                             </td>
                         </tr>
                         {% endfor %}
@@ -95,42 +98,9 @@
             {% else %}
             <div class="info-card">
                 <h3>Пользователей пока нет</h3>
-                <p>После регистрации аккаунтов они появятся здесь для управления ролями.</p>
+                <p>После регистрации клиенты и сотрудники появятся в этом разделе.</p>
             </div>
             {% endif %}
-        </section>
-
-        <section class="content-card">
-            <div class="section-head">
-                <h2>Подсказки по ролям</h2>
-                <p>Лучше держать роли простыми и понятными, чтобы не запутаться в доступах.</p>
-            </div>
-
-            <div class="feature-grid">
-                <div class="feature-card">
-                    <div class="feature-icon">A</div>
-                    <h3>Admin</h3>
-                    <p>Полный доступ к пользователям, заявкам, прайсу и удалению записей.</p>
-                </div>
-
-                <div class="feature-card">
-                    <div class="feature-icon">M</div>
-                    <h3>Manager</h3>
-                    <p>Может работать с заявками, прайсом и отзывами, но без полного контроля над системой.</p>
-                </div>
-
-                <div class="feature-card">
-                    <div class="feature-icon">C</div>
-                    <h3>Client</h3>
-                    <p>Обычный пользователь сайта: заявки, отзывы и личный кабинет без админ-доступа.</p>
-                </div>
-
-                <div class="feature-card">
-                    <div class="feature-icon">🔐</div>
-                    <h3>Безопасность</h3>
-                    <p>Не давай роль admin без необходимости и периодически проверяй список пользователей.</p>
-                </div>
-            </div>
         </section>
     </div>
 </div>
