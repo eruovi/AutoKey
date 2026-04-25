@@ -2,8 +2,12 @@ from flask import Flask, render_template, request, redirect, url_for, flash, ses
 from flask_sqlalchemy import SQLAlchemy
 from functools import wraps
 from werkzeug.security import generate_password_hash, check_password_hash
+from sqlalchemy import text
 import os
 import re
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 TEMPLATES_DIR = os.path.join(BASE_DIR, 'templates')
@@ -25,6 +29,21 @@ PRICES = [
     {'service': 'Ремонт замка зажигания', 'price': 'от 2000 руб.', 'time': '1 час'},
 ]
 
+CAR_BRANDS = {
+    'Toyota': ['Camry', 'Corolla', 'RAV4', 'Land Cruiser', 'Prius'],
+    'Volkswagen': ['Polo', 'Passat', 'Golf', 'Tiguan', 'Touareg'],
+    'BMW': ['3 Series', '5 Series', 'X3', 'X5', 'X6'],
+    'Mercedes-Benz': ['C-Class', 'E-Class', 'S-Class', 'GLC', 'GLE'],
+    'LADA': ['Granta', 'Vesta', 'Niva', 'Largus', 'XRAY'],
+    'Kia': ['Rio', 'Ceed', 'Sportage', 'Sorento', 'Cerato'],
+    'Hyundai': ['Solaris', 'Elantra', 'Creta', 'Tucson', 'Santa Fe'],
+    'Renault': ['Logan', 'Duster', 'Sandero', 'Megane', 'Kaptur'],
+    'Nissan': ['Almera', 'Qashqai', 'X-Trail', 'Teana', 'Juke'],
+    'Ford': ['Focus', 'Mondeo', 'Kuga', 'Fiesta', 'Explorer'],
+    'Skoda': ['Rapid', 'Octavia', 'Superb', 'Kodiaq', 'Yeti'],
+    'Audi': ['A4', 'A6', 'Q3', 'Q5', 'Q7']
+}
+
 
 class User(db.Model):
     __tablename__ = 'users'
@@ -33,6 +52,11 @@ class User(db.Model):
     username = db.Column(db.String(100), unique=True, nullable=False)
     password = db.Column(db.String(200), nullable=False)
     role = db.Column(db.String(20), default='client')
+    first_name = db.Column(db.String(100), nullable=True)
+    last_name = db.Column(db.String(100), nullable=True)
+    email = db.Column(db.String(150), unique=True, nullable=True)
+    consent_accepted = db.Column(db.Boolean, default=False)
+    consent_at = db.Column(db.DateTime, nullable=True)
 
     orders = db.relationship('Order', backref='user', lazy=True)
 
@@ -59,6 +83,32 @@ class Review(db.Model):
     rating = db.Column(db.Integer, nullable=False, default=5)
     is_published = db.Column(db.Boolean, default=True)
     created_at = db.Column(db.DateTime, default=db.func.now())
+
+
+def send_email(to_email, subject, html_message):
+    smtp_host = os.getenv('MAIL_SERVER')
+    smtp_port = int(os.getenv('MAIL_PORT', 587))
+    smtp_user = os.getenv('MAIL_USERNAME')
+    smtp_password = os.getenv('MAIL_PASSWORD')
+    from_email = os.getenv('MAIL_FROM', smtp_user)
+
+    if not smtp_host or not smtp_user or not smtp_password or not to_email:
+        return
+
+    msg = MIMEMultipart()
+    msg['From'] = from_email
+    msg['To'] = to_email
+    msg['Subject'] = subject
+    msg.attach(MIMEText(html_message, 'html', 'utf-8'))
+
+    try:
+        server = smtplib.SMTP(smtp_host, smtp_port)
+        server.starttls()
+        server.login(smtp_user, smtp_password)
+        server.send_message(msg)
+        server.quit()
+    except Exception as e:
+        print('Ошибка отправки email:', e)
 
 
 def login_required(f):
@@ -93,20 +143,53 @@ def manager_required(f):
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
+        first_name = request.form['first_name'].strip()
+        last_name = request.form['last_name'].strip()
+        email = request.form['email'].strip().lower()
         username = request.form['username'].strip()
         password = request.form['password'].strip()
+        consent = request.form.get('consent')
+
+        if not consent:
+            flash('Нужно подтвердить согласие на обработку персональных данных.')
+            return render_template('register.html')
+
+        if not re.fullmatch(r'[^@]+@[^@]+\.[^@]+', email):
+            flash('Введите корректный email.')
+            return render_template('register.html')
 
         if User.query.filter_by(username=username).first():
             flash('Пользователь с таким логином уже существует.')
             return render_template('register.html')
 
+        if User.query.filter_by(email=email).first():
+            flash('Пользователь с таким email уже существует.')
+            return render_template('register.html')
+
         user = User(
+            first_name=first_name,
+            last_name=last_name,
+            email=email,
             username=username,
             password=generate_password_hash(password),
-            role='client'
+            role='client',
+            consent_accepted=True,
+            consent_at=db.func.now()
         )
         db.session.add(user)
         db.session.commit()
+
+        send_email(
+            email,
+            'Регистрация в AutoKey',
+            f'''
+            <h2>Здравствуйте, {first_name} {last_name}!</h2>
+            <p>Вы успешно зарегистрировались на сайте AutoKey.</p>
+            <p>Ваш логин: <b>{username}</b></p>
+            <p>Теперь вы можете входить в личный кабинет и отслеживать свои заявки.</p>
+            '''
+        )
+
         flash('Регистрация прошла успешно. Теперь войдите в аккаунт.')
         return redirect(url_for('login'))
 
@@ -124,6 +207,9 @@ def login():
             session['user_id'] = user.id
             session['username'] = user.username
             session['role'] = user.role
+            session['first_name'] = user.first_name or ''
+            session['last_name'] = user.last_name or ''
+            session['email'] = user.email or ''
 
             if user.role == 'admin':
                 return redirect(url_for('admin_dashboard'))
@@ -152,6 +238,9 @@ def admin_login():
             session['user_id'] = user.id
             session['username'] = user.username
             session['role'] = user.role
+            session['first_name'] = user.first_name or ''
+            session['last_name'] = user.last_name or ''
+            session['email'] = user.email or ''
 
             if user.role == 'manager':
                 return redirect(url_for('admin_orders'))
@@ -210,31 +299,63 @@ def contacts():
     return render_template('contacts.html')
 
 
+@app.route('/privacy')
+def privacy():
+    return render_template('privacy.html')
+
+
 @app.route('/contact', methods=['GET', 'POST'])
 def contact():
+    current_user = None
+    if session.get('user_id'):
+        current_user = User.query.get(session['user_id'])
+
     if request.method == 'POST':
-        name = request.form['name'].strip()
+        first_name = request.form['first_name'].strip()
+        last_name = request.form['last_name'].strip()
         phone = request.form['phone'].strip()
+        brand = request.form['brand'].strip()
         car_model = request.form['car_model'].strip()
         service = request.form['service'].strip()
 
+        full_name = f'{first_name} {last_name}'.strip()
+
+        valid_models = CAR_BRANDS.get(brand, [])
+        if car_model not in valid_models:
+            flash('Выберите реальную модель автомобиля из списка.')
+            return render_template('contact.html', user=current_user, car_brands=CAR_BRANDS)
+
         if not re.fullmatch(r'\+7[0-9]{10}', phone):
             flash('Введите номер телефона в формате +79991234567')
-            return redirect(url_for('contact'))
+            return render_template('contact.html', user=current_user, car_brands=CAR_BRANDS)
 
         order = Order(
-            name=name,
+            name=full_name,
             phone=phone,
-            car_model=car_model,
+            car_model=f'{brand} {car_model}',
             service=service,
             user_id=session.get('user_id')
         )
         db.session.add(order)
         db.session.commit()
+
+        if current_user and current_user.email:
+            send_email(
+                current_user.email,
+                'Ваша заявка принята',
+                f'''
+                <h2>Здравствуйте, {full_name}!</h2>
+                <p>Ваша заявка успешно создана.</p>
+                <p><b>Автомобиль:</b> {brand} {car_model}</p>
+                <p><b>Услуга:</b> {service}</p>
+                <p><b>Статус:</b> новая</p>
+                '''
+            )
+
         flash('Заявка успешно отправлена.')
         return redirect(url_for('contact'))
 
-    return render_template('contact.html')
+    return render_template('contact.html', user=current_user, car_brands=CAR_BRANDS)
 
 
 @app.route('/reviews', methods=['GET', 'POST'])
@@ -295,6 +416,24 @@ def admin_order_status(id):
     order = Order.query.get_or_404(id)
     order.status = request.form['status']
     db.session.commit()
+
+    if order.user_id:
+        user = User.query.get(order.user_id)
+        if user and user.email:
+            send_email(
+                user.email,
+                'Изменён статус заявки',
+                f'''
+                <h2>Здравствуйте, {user.first_name or user.username}!</h2>
+                <p>Статус вашей заявки изменён.</p>
+                <p><b>Заявка:</b> #{order.id}</p>
+                <p><b>Услуга:</b> {order.service}</p>
+                <p><b>Автомобиль:</b> {order.car_model}</p>
+                <p><b>Новый статус:</b> {order.status}</p>
+                '''
+            )
+
+    flash('Статус заявки обновлён.')
     return redirect(url_for('admin_orders'))
 
 
@@ -373,28 +512,52 @@ def admin_user_role(id):
     return redirect(url_for('admin_users'))
 
 
+def add_missing_columns():
+    with db.engine.connect() as conn:
+        columns = [row[1] for row in conn.execute(text("PRAGMA table_info(users)")).fetchall()]
+
+        if 'first_name' not in columns:
+            conn.execute(text("ALTER TABLE users ADD COLUMN first_name VARCHAR(100)"))
+        if 'last_name' not in columns:
+            conn.execute(text("ALTER TABLE users ADD COLUMN last_name VARCHAR(100)"))
+        if 'email' not in columns:
+            conn.execute(text("ALTER TABLE users ADD COLUMN email VARCHAR(150)"))
+        if 'consent_accepted' not in columns:
+            conn.execute(text("ALTER TABLE users ADD COLUMN consent_accepted BOOLEAN DEFAULT 0"))
+        if 'consent_at' not in columns:
+            conn.execute(text("ALTER TABLE users ADD COLUMN consent_at DATETIME"))
+        conn.commit()
+
+
 with app.app_context():
     db.create_all()
+    add_missing_columns()
 
     if not User.query.filter_by(username='admin').first():
         admin_user = User(
             username='admin',
             password=generate_password_hash('admin123'),
-            role='admin'
+            role='admin',
+            first_name='Главный',
+            last_name='Администратор',
+            email='admin@example.com',
+            consent_accepted=True
         )
         db.session.add(admin_user)
         db.session.commit()
-        print('Создан админ: логин admin, пароль admin123')
 
     if not User.query.filter_by(username='manager').first():
         manager_user = User(
             username='manager',
             password=generate_password_hash('manager123'),
-            role='manager'
+            role='manager',
+            first_name='Менеджер',
+            last_name='AutoKey',
+            email='manager@example.com',
+            consent_accepted=True
         )
         db.session.add(manager_user)
         db.session.commit()
-        print('Создан менеджер: логин manager, пароль manager123')
 
 
 if __name__ == '__main__':

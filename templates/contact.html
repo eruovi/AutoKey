@@ -1,126 +1,85 @@
 {% extends 'base.html' %}
-{% block title %}Заявка | Автоключи 33{% endblock %}
+{% block title %}Оставить заявку{% endblock %}
 {% block content %}
 
-<section class="hero" style="align-items: start;">
-    <div class="hero-panel">
-        <div class="hero-kicker">Заявка на услугу • Быстрый выезд • Владимир и область</div>
-        <h1>Оставьте заявку на изготовление ключа или помощь с автомобилем</h1>
-        <p>
-            Заполните короткую форму, и мы свяжемся с вами для уточнения деталей.
-            Укажите номер телефона, модель автомобиля и нужную услугу.
-        </p>
-
-        <div class="stats-grid" style="margin-top: 26px;">
-            <div class="stat-card">
-                <strong>24/7</strong>
-                <p>Работаем в срочном режиме без выходных</p>
-            </div>
-            <div class="stat-card">
-                <strong>+7</strong>
-                <p>Принимается только российский номер телефона</p>
-            </div>
-            <div class="stat-card">
-                <strong>Быстро</strong>
-                <p>Связываемся после получения заявки</p>
-            </div>
-            <div class="stat-card">
-                <strong>Удобно</strong>
-                <p>Форма отправляется прямо через сайт</p>
-            </div>
-        </div>
-    </div>
-
-    <div class="content-card">
-        <div class="section-head">
-            <h2>Форма заявки</h2>
-            <p>Заполните данные корректно. Номер телефона нужно вводить только в формате +7XXXXXXXXXX.</p>
-        </div>
-
-        <form method="POST">
-          
-
- <div class="form-group">
-    <label class="form-label">Ваше имя</label>
-    <input type="text" name="name" placeholder="Например: Иван" required>
-</div>
-
-<div class="form-group">
-    <label class="form-label">Телефон</label>
-    <input type="tel" id="phone" name="phone" placeholder="+79991234567"
-           pattern="^\+7[0-9]{10}$" maxlength="12" inputmode="numeric" required>
-</div>
-
-<div class="form-group">
-    <label class="form-label">Модель автомобиля</label>
-    <input type="text" name="car_model" placeholder="Например: Lada Vesta" required>
-</div>
-
-<div class="form-group">
-    <label class="form-label">Необходимая услуга</label>
-    <select name="service" required>
-        <option value="">Выберите услугу</option>
-        <option value="Изготовление ключа">Изготовление ключа</option>
-        <option value="Аварийное вскрытие автомобиля">Аварийное вскрытие автомобиля</option>
-        <option value="Ремонт замка">Ремонт замка</option>
-        <option value="Программирование чипа">Программирование чипа</option>
-    </select>
-</div>
-            <button type="submit">Отправить заявку</button>
-        </form>
-    </div>
-</section>
-
-<section class="content-card">
+<div class="content-card" style="max-width:860px; margin:0 auto;">
     <div class="section-head">
-        <h2>Как правильно ввести номер</h2>
-        <p>Система принимает только российский номер телефона, начинающийся с +7.</p>
+        <h2>Оставить заявку</h2>
+        <p>Заполните форму, и мы свяжемся с вами для уточнения деталей.</p>
     </div>
 
-    <div class="feature-grid">
-        <div class="feature-card">
-            <div class="feature-icon">1</div>
-            <h3>Правильно</h3>
-            <p>+79991234567</p>
+    <form method="POST">
+        <div class="form-grid">
+            <div class="form-group">
+                <label class="form-label">Имя</label>
+                <input type="text" name="first_name" required value="{{ user.first_name if user else '' }}">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Фамилия</label>
+                <input type="text" name="last_name" required value="{{ user.last_name if user else '' }}">
+            </div>
         </div>
 
-        <div class="feature-card">
-            <div class="feature-icon">2</div>
-            <h3>Неправильно</h3>
-            <p>89991234567, 9991234567, +7(999)1234567, буквы и пробелы</p>
+        <div class="form-grid">
+            <div class="form-group">
+                <label class="form-label">Телефон</label>
+                <input type="text" name="phone" placeholder="+79991234567" required>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Услуга</label>
+                <select name="service" required>
+                    <option value="">Выберите услугу</option>
+                    <option>Изготовление ключа</option>
+                    <option>Программирование чип-ключа</option>
+                    <option>Аварийное вскрытие автомобиля</option>
+                    <option>Ремонт замка зажигания</option>
+                </select>
+            </div>
         </div>
 
-        <div class="feature-card">
-            <div class="feature-icon">3</div>
-            <h3>Без пробелов</h3>
-            <p>Номер нужно вводить слитно, без скобок, тире и дополнительных символов.</p>
+        <div class="form-grid">
+            <div class="form-group">
+                <label class="form-label">Марка автомобиля</label>
+                <select name="brand" id="brand-select" required>
+                    <option value="">Выберите марку</option>
+                    {% for brand in car_brands.keys() %}
+                        <option value="{{ brand }}">{{ brand }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Модель автомобиля</label>
+                <select name="car_model" id="model-select" required>
+                    <option value="">Сначала выберите марку</option>
+                </select>
+            </div>
         </div>
 
-        <div class="feature-card">
-            <div class="feature-icon">4</div>
-            <h3>Только РФ</h3>
-            <p>Форма настроена только на российские номера в формате +7XXXXXXXXXX.</p>
-        </div>
-    </div>
-</section>
+        <button type="submit" class="btn btn-primary">Отправить заявку</button>
+    </form>
+</div>
 
 <script>
-document.getElementById('phone').addEventListener('input', function () {
-    let value = this.value.replace(/[^\d+]/g, '');
+    const carBrands = {{ car_brands | tojson }};
+    const brandSelect = document.getElementById('brand-select');
+    const modelSelect = document.getElementById('model-select');
 
-    if (!value.startsWith('+7')) {
-        if (value.startsWith('8')) {
-            value = '+7' + value.slice(1);
-        } else if (value.startsWith('7')) {
-            value = '+7' + value.slice(1);
-        } else if (!value.startsWith('+7')) {
-            value = '+7';
-        }
-    }
+    brandSelect.addEventListener('change', function () {
+        const brand = this.value;
+        const models = carBrands[brand] || [];
 
-    value = '+7' + value.replace(/^\+?7/, '').replace(/\D/g, '').slice(0, 10);
-    this.value = value;
-});
+        modelSelect.innerHTML = '<option value="">Выберите модель</option>';
+
+        models.forEach(model => {
+            const option = document.createElement('option');
+            option.value = model;
+            option.textContent = model;
+            modelSelect.appendChild(option);
+        });
+    });
 </script>
 
 {% endblock %}
