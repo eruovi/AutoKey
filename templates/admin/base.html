@@ -158,99 +158,29 @@
             padding: 34px 20px 60px;
         }
 
-        .hero {
-            display: grid;
-            grid-template-columns: 1.1fr .9fr;
-            gap: 24px;
-            align-items: stretch;
-            margin-bottom: 26px;
-        }
-
-        .hero-panel {
-            background: linear-gradient(135deg, #0f172a 0%, #111827 45%, #0f766e 100%);
-            color: white;
-            border-radius: 30px;
-            padding: 38px;
-            box-shadow: 0 24px 60px rgba(15, 23, 42, .16);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .hero-kicker {
-            display: inline-block;
-            padding: 8px 12px;
-            border-radius: 999px;
-            background: rgba(255,255,255,.12);
-            font-size: 13px;
-            font-weight: 700;
-            margin-bottom: 16px;
-        }
-
-        .hero-panel h1 {
-            margin: 0 0 16px;
-            font-size: clamp(32px, 5vw, 58px);
-            line-height: 1.02;
-        }
-
-        .hero-panel p {
-            margin: 0 0 22px;
-            color: rgba(255,255,255,.88);
-            font-size: 17px;
-            line-height: 1.75;
-            max-width: 650px;
-        }
-
-        .hero-actions { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 24px; }
-
-        .hero-image-card, .content-card, .table-card, .feature-card, .auth-card, .gallery-card, .info-card, .stat-card, .review-card {
+        .content-card, .table-card, .auth-card, .info-card, .stat-card {
             background: white;
             border-radius: 24px;
             box-shadow: var(--shadow);
             overflow: hidden;
         }
 
-        .hero-image {
-            width: 100%;
-            height: 100%;
-            min-height: 420px;
-            max-height: 520px;
-            object-fit: cover;
-            object-position: center;
+        .content-card, .table-card, .auth-card, .info-card {
+            padding: 28px;
         }
-
-        .content-card, .table-card, .auth-card, .info-card { padding: 28px; }
 
         .section-head { margin-bottom: 22px; }
         .section-head h2 { margin: 0 0 10px; font-size: 32px; line-height: 1.05; }
-        .section-head p, .feature-card p, .info-card p, .auth-card p, .review-card p { margin: 0; color: var(--muted); line-height: 1.75; }
+        .section-head p, .info-card p { margin: 0; color: var(--muted); line-height: 1.75; }
 
-        .feature-grid, .stats-grid, .reviews-grid {
+        .stats-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
             gap: 18px;
         }
 
-        .feature-card, .stat-card, .review-card { padding: 22px; }
-
-        .feature-icon {
-            width: 54px; height: 54px; border-radius: 16px; display: grid; place-items: center;
-            background: #ecfeff; color: var(--accent); font-size: 24px; margin-bottom: 16px;
-        }
-
-        .feature-card h3, .gallery-card h3, .info-card h3, .stat-card h3, .review-card h3 { margin: 0 0 10px; font-size: 20px; }
+        .stat-card { padding: 22px; }
         .stat-card strong { font-size: 34px; display: block; margin-bottom: 8px; }
-
-        .gallery-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-            gap: 20px;
-        }
-
-        .gallery-card img {
-            width: 100%; height: 240px; object-fit: cover; object-position: center;
-        }
-
-        .gallery-card-body { padding: 18px; }
 
         .flash {
             background: var(--success-bg);
@@ -335,9 +265,7 @@
             white-space: nowrap;
         }
 
-        td {
-            white-space: nowrap;
-        }
+        td { white-space: nowrap; }
 
         .text-cell,
         .user-name-cell {
@@ -391,15 +319,20 @@
             min-width: 0;
         }
 
-        .review-stars { color: #f59e0b; font-size: 18px; margin-bottom: 12px; }
+        .review-stars {
+            color: #f59e0b;
+            font-size: 18px;
+            margin-bottom: 12px;
+        }
 
-        .admin-orders-table { min-width: 1100px; }
-        .admin-users-table { min-width: 900px; }
+        .admin-orders-table { min-width: 1160px; }
+        .admin-users-table { min-width: 960px; }
+        .admin-reviews-table { min-width: 1020px; }
 
         .date-cell, .status-cell { white-space: nowrap; }
-        .actions-cell { min-width: 260px; white-space: normal; }
+        .actions-cell { min-width: 320px; white-space: normal; }
         .role-cell { min-width: 220px; }
-        .action-button-cell { min-width: 180px; }
+        .action-button-cell { min-width: 220px; }
 
         .actions-stack {
             display: flex;
@@ -408,18 +341,38 @@
             align-items: stretch;
         }
 
+        .actions-stack form {
+            width: 100%;
+            margin: 0;
+        }
+
+        .actions-stack button,
+        .actions-stack .btn,
+        .actions-stack .btn-danger {
+            width: 100%;
+            justify-content: center;
+        }
+
         .inline-admin-form,
         .user-role-form {
             display: flex;
             gap: 10px;
-            flex-wrap: wrap;
+            flex-wrap: nowrap;
             align-items: center;
+            width: 100%;
         }
 
         .inline-admin-form select,
         .user-role-form select {
-            min-width: 160px;
-            flex: 1 1 160px;
+            min-width: 180px;
+            flex: 1 1 180px;
+        }
+
+        .inline-admin-form button,
+        .user-role-form button {
+            min-width: 170px;
+            flex: 0 0 170px;
+            white-space: nowrap;
         }
 
         .admin-note {
@@ -449,7 +402,7 @@
 
         .admin-form-actions .btn,
         .admin-form-actions button {
-            min-width: 220px;
+            min-width: 240px;
             justify-content: center;
         }
 
@@ -465,28 +418,42 @@
         }
 
         @media (max-width: 1024px) {
-            .hero, .feature-grid, .stats-grid, .reviews-grid { grid-template-columns: 1fr; }
+            .stats-grid { grid-template-columns: 1fr; }
             .admin-layout { grid-template-columns: 1fr; }
             .form-grid { grid-template-columns: 1fr; }
-            .hero-image { min-height: 320px; max-height: 380px; }
-            .admin-orders-table { min-width: 980px; }
-            .admin-users-table { min-width: 860px; }
-            table { min-width: 680px; }
+            .admin-orders-table { min-width: 1080px; }
+            .admin-users-table { min-width: 900px; }
+            .admin-reviews-table { min-width: 980px; }
+            table { min-width: 760px; }
         }
 
         @media (max-width: 760px) {
             .nav-inner { flex-direction: column; align-items: flex-start; }
-            .nav-links, .nav-actions, .gallery-grid { width: 100%; }
-            .hero-panel, .hero-image-card, .content-card, .table-card, .auth-card, .info-card, .gallery-card { border-radius: 22px; }
-            .hero-panel, .content-card, .table-card, .auth-card, .info-card { padding: 22px; }
+            .nav-links, .nav-actions { width: 100%; }
+            .content-card, .table-card, .auth-card, .info-card { border-radius: 22px; padding: 22px; }
             .page-shell { padding: 20px 14px 40px; }
             .nav-links a, .btn, button { width: 100%; justify-content: center; }
             .user-badge { width: 100%; text-align: center; }
-            .hero-image { height: 280px; min-height: 280px; max-height: 280px; }
 
-            .admin-orders-table { min-width: 920px; }
-            .admin-users-table { min-width: 820px; }
-            table { min-width: 620px; }
+            .admin-orders-table { min-width: 1040px; }
+            .admin-users-table { min-width: 860px; }
+            .admin-reviews-table { min-width: 940px; }
+            table { min-width: 700px; }
+
+            .inline-admin-form,
+            .user-role-form {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .inline-admin-form select,
+            .user-role-form select,
+            .inline-admin-form button,
+            .user-role-form button {
+                width: 100%;
+                min-width: 0;
+                flex: 1 1 auto;
+            }
 
             .admin-form-actions {
                 flex-direction: column;
@@ -499,9 +466,7 @@
                 min-width: 0;
             }
 
-            .price-edit-card {
-                padding: 16px;
-            }
+            .price-edit-card { padding: 16px; }
         }
     </style>
 </head>

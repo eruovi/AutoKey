@@ -1,4 +1,4 @@
-{% extends 'base.html' %}
+{% extends 'admin/base.html' %}
 {% block title %}Заявки | Админ-панель{% endblock %}
 {% block content %}
 
@@ -14,39 +14,10 @@
     </aside>
 
     <div class="admin-main">
-        <section class="content-card">
-            <div class="section-head">
-                <h2>Управление заявками</h2>
-                <p>Здесь можно просматривать заявки, менять их статус и удалять записи при необходимости.</p>
-            </div>
-
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <strong>{{ orders|length }}</strong>
-                    <p>Всего заявок в списке</p>
-                </div>
-
-                <div class="stat-card">
-                    <strong>{{ orders | selectattr('status', 'equalto', 'новая') | list | length }}</strong>
-                    <p>Новые заявки</p>
-                </div>
-
-                <div class="stat-card">
-                    <strong>{{ orders | selectattr('status', 'equalto', 'в работе') | list | length }}</strong>
-                    <p>Сейчас в работе</p>
-                </div>
-
-                <div class="stat-card">
-                    <strong>{{ orders | selectattr('status', 'equalto', 'выполнена') | list | length }}</strong>
-                    <p>Завершённые заявки</p>
-                </div>
-            </div>
-        </section>
-
         <section class="table-card">
             <div class="section-head">
                 <h2>Список заявок</h2>
-                <p>Менеджер и администратор могут менять статус, удаление доступно только администратору.</p>
+                <p>Менеджер и администратор могут менять статус заявки, удаление доступно только администратору.</p>
             </div>
 
             {% if orders %}
@@ -55,10 +26,10 @@
                     <thead>
                         <tr>
                             <th>ID</th>
-                            <th>Имя</th>
+                            <th>Клиент</th>
                             <th>Телефон</th>
-                            <th>Автомобиль</th>
-                            <th class="text-cell">Услуга</th>
+                            <th>Авто</th>
+                            <th>Услуга</th>
                             <th class="date-cell">Дата</th>
                             <th class="status-cell">Статус</th>
                             <th class="actions-cell">Действия</th>
@@ -68,9 +39,9 @@
                         {% for order in orders %}
                         <tr>
                             <td>#{{ order.id }}</td>
-                            <td>{{ order.name }}</td>
+                            <td class="user-name-cell">{{ order.name }}</td>
                             <td>{{ order.phone }}</td>
-                            <td>{{ order.car_model }}</td>
+                            <td class="text-cell">{{ order.car_model }}</td>
                             <td class="text-cell">{{ order.service }}</td>
                             <td class="date-cell">
                                 {{ order.created_at.strftime('%Y-%m-%d %H:%M') if order.created_at else '-' }}
@@ -78,8 +49,6 @@
                             <td class="status-cell">
                                 {% if order.status == 'выполнена' %}
                                     <span class="status done">Выполнена</span>
-                                {% elif order.status == 'в работе' %}
-                                    <span class="status">В работе</span>
                                 {% elif order.status == 'новая' %}
                                     <span class="status">Новая</span>
                                 {% else %}
@@ -89,20 +58,18 @@
                             <td class="actions-cell">
                                 <div class="actions-stack">
                                     <form method="POST" action="{{ url_for('admin_order_status', id=order.id) }}" class="inline-admin-form">
-                                        <select name="status">
-                                            <option value="новая" {% if order.status == 'новая' %}selected{% endif %}>новая</option>
-                                            <option value="в работе" {% if order.status == 'в работе' %}selected{% endif %}>в работе</option>
-                                            <option value="выполнена" {% if order.status == 'выполнена' %}selected{% endif %}>выполнена</option>
+                                        <select name="status" required>
+                                            <option value="новая" {% if order.status == 'новая' %}selected{% endif %}>Новая</option>
+                                            <option value="в работе" {% if order.status == 'в работе' %}selected{% endif %}>В работе</option>
+                                            <option value="выполнена" {% if order.status == 'выполнена' %}selected{% endif %}>Выполнена</option>
                                         </select>
                                         <button type="submit">Сохранить</button>
                                     </form>
 
                                     {% if session.get('role') == 'admin' %}
-                                    <form method="POST" action="{{ url_for('admin_order_delete', id=order.id) }}" onsubmit="return confirm('Удалить заявку?');">
-                                        <button type="submit" class="btn-danger">Удалить заявку</button>
+                                    <form method="POST" action="{{ url_for('admin_order_delete', id=order.id) }}">
+                                        <button type="submit" class="btn-danger" onclick="return confirm('Удалить заявку?');">Удалить заявку</button>
                                     </form>
-                                    {% else %}
-                                    <span class="admin-note">Удаление доступно только администратору</span>
                                     {% endif %}
                                 </div>
                             </td>
@@ -114,7 +81,7 @@
             {% else %}
             <div class="info-card">
                 <h3>Заявок пока нет</h3>
-                <p>Когда клиенты начнут оставлять заявки, они появятся здесь.</p>
+                <p>Новые заявки клиентов появятся здесь.</p>
             </div>
             {% endif %}
         </section>
