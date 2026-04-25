@@ -552,10 +552,28 @@
             padding: 14px 16px;
             font-size: 15px;
             background: rgba(255,255,255,.06);
-            color: white;
+            color: #ffffff;
             outline: none;
             transition: var(--transition);
             backdrop-filter: blur(10px);
+        }
+
+        select {
+            background: #0d1b2d !important;
+            background-color: #0d1b2d !important;
+            color: #ffffff !important;
+            border: 1px solid rgba(255,255,255,.12);
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            cursor: pointer;
+        }
+
+        select option,
+        select optgroup {
+            background: #0d1b2d !important;
+            background-color: #0d1b2d !important;
+            color: #ffffff !important;
         }
 
         input::placeholder, textarea::placeholder {
@@ -573,8 +591,17 @@
             resize: vertical;
         }
 
+        .table-wrap {
+            width: 100%;
+            overflow-x: auto;
+            overflow-y: hidden;
+            -webkit-overflow-scrolling: touch;
+            border-radius: 20px;
+        }
+
         table {
             width: 100%;
+            min-width: 760px;
             border-collapse: collapse;
             overflow: hidden;
         }
@@ -593,6 +620,11 @@
             font-size: 13px;
             text-transform: uppercase;
             letter-spacing: .04em;
+            white-space: nowrap;
+        }
+
+        td {
+            white-space: nowrap;
         }
 
         tr:hover td {
@@ -608,6 +640,7 @@
             background: rgba(79,140,255,.16);
             color: #d7e7ff;
             border: 1px solid rgba(79,140,255,.22);
+            white-space: nowrap;
         }
 
         .status.done {
@@ -626,6 +659,7 @@
             display: grid;
             grid-template-columns: 260px 1fr;
             gap: 24px;
+            align-items: start;
         }
 
         .admin-sidebar {
@@ -657,6 +691,7 @@
         .admin-main {
             display: grid;
             gap: 20px;
+            min-width: 0;
         }
 
         .review-stars {
@@ -727,7 +762,11 @@
         }
 
         @media (max-width: 1024px) {
-            .hero, .feature-grid, .stats-grid, .admin-layout, .reviews-grid {
+            .hero, .feature-grid, .stats-grid, .reviews-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .admin-layout {
                 grid-template-columns: 1fr;
             }
 
@@ -738,6 +777,10 @@
             .hero-image {
                 min-height: 320px;
                 max-height: 380px;
+            }
+
+            table {
+                min-width: 680px;
             }
         }
 
@@ -843,6 +886,10 @@
 
             .section-head h2 {
                 font-size: 28px;
+            }
+
+            table {
+                min-width: 620px;
             }
         }
 
