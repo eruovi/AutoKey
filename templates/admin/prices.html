@@ -49,9 +49,9 @@
                 <p>Заполняйте поля аккуратно и в одном стиле, чтобы прайс на сайте выглядел чисто и понятно.</p>
             </div>
 
-            <form method="POST">
+            <form method="POST" class="price-editor-form">
                 {% for item in prices %}
-                <div class="info-card" style="margin-bottom: 18px;">
+                <div class="price-edit-card">
                     <div class="form-group">
                         <label class="form-label">Название услуги</label>
                         <input type="text" name="service" value="{{ item.service }}" required>
@@ -71,7 +71,7 @@
                 </div>
                 {% endfor %}
 
-                <div class="hero-actions">
+                <div class="admin-form-actions">
                     <button type="submit">Сохранить прайс</button>
                     <a href="{{ url_for('prices') }}" class="btn btn-light">Посмотреть страницу цен</a>
                 </div>
