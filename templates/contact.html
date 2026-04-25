@@ -24,7 +24,16 @@
         <div class="form-grid">
             <div class="form-group">
                 <label class="form-label">Телефон</label>
-                <input type="text" name="phone" placeholder="+79991234567" required>
+                <input
+                    type="tel"
+                    name="phone"
+                    placeholder="+79991234567"
+                    inputmode="numeric"
+                    pattern="^\+7[0-9]{10}$"
+                    maxlength="12"
+                    required
+                    oninput="this.value = this.value.replace(/[^0-9+]/g, ''); if (!this.value.startsWith('+')) { this.value = '+' + this.value.replace(/\+/g, ''); } if (this.value.indexOf('+') > 0) { this.value = '+' + this.value.replace(/\+/g, ''); } this.value = this.value.slice(0, 12);"
+                >
             </div>
 
             <div class="form-group">

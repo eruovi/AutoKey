@@ -3,6 +3,7 @@ from flask_sqlalchemy import SQLAlchemy
 from functools import wraps
 from werkzeug.security import generate_password_hash, check_password_hash
 from sqlalchemy import text
+from itsdangerous import URLSafeTimedSerializer, SignatureExpired, BadSignature
 import os
 import re
 import smtplib
@@ -14,13 +15,15 @@ TEMPLATES_DIR = os.path.join(BASE_DIR, 'templates')
 STATIC_DIR = os.path.join(BASE_DIR, 'static')
 
 app = Flask(__name__, template_folder=TEMPLATES_DIR, static_folder=STATIC_DIR)
-app.secret_key = 'autokey-secret2026'
+app.secret_key = os.getenv('SECRET_KEY', 'autokey-secret2026')
 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(BASE_DIR, 'orders.db')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {'pool_pre_ping': True}
 
 db = SQLAlchemy(app)
+
+serializer = URLSafeTimedSerializer(app.secret_key)
 
 PRICES = [
     {'service': 'Изготовление ключа', 'price': 'от 500 руб.', 'time': '30 мин'},
@@ -30,27 +33,74 @@ PRICES = [
 ]
 
 CAR_BRANDS = {
-    'Toyota': ['Camry', 'Corolla', 'RAV4', 'Land Cruiser', 'Prius'],
-    'Volkswagen': ['Polo', 'Passat', 'Golf', 'Tiguan', 'Touareg'],
-    'BMW': ['3 Series', '5 Series', 'X3', 'X5', 'X6'],
-    'Mercedes-Benz': ['C-Class', 'E-Class', 'S-Class', 'GLC', 'GLE'],
-    'LADA': ['Granta', 'Vesta', 'Niva', 'Largus', 'XRAY'],
-    'Kia': ['Rio', 'Ceed', 'Sportage', 'Sorento', 'Cerato'],
-    'Hyundai': ['Solaris', 'Elantra', 'Creta', 'Tucson', 'Santa Fe'],
-    'Renault': ['Logan', 'Duster', 'Sandero', 'Megane', 'Kaptur'],
-    'Nissan': ['Almera', 'Qashqai', 'X-Trail', 'Teana', 'Juke'],
-    'Ford': ['Focus', 'Mondeo', 'Kuga', 'Fiesta', 'Explorer'],
-    'Skoda': ['Rapid', 'Octavia', 'Superb', 'Kodiaq', 'Yeti'],
-    'Audi': ['A4', 'A6', 'Q3', 'Q5', 'Q7']
+    'Acura': ['CL', 'CSX', 'ILX', 'Integra', 'MDX', 'NSX', 'RDX', 'RL', 'RLX', 'RSX', 'TL', 'TLX', 'TSX', 'ZDX'],
+    'Alfa Romeo': ['147', '156', '159', '166', 'Brera', 'Giulia', 'Giulietta', 'GT', 'MiTo', 'Spider', 'Stelvio', 'Tonale'],
+    'Audi': ['100', '80', 'A1', 'A3', 'A4', 'A5', 'A6', 'A7', 'A8', 'Allroad', 'Q2', 'Q3', 'Q5', 'Q7', 'Q8', 'RS3', 'RS4', 'RS5', 'RS6', 'S3', 'S4', 'S5', 'S6', 'TT'],
+    'BMW': ['1 Series', '2 Series', '3 Series', '4 Series', '5 Series', '6 Series', '7 Series', '8 Series', 'i3', 'i4', 'i8', 'iX', 'M2', 'M3', 'M4', 'M5', 'M8', 'X1', 'X2', 'X3', 'X4', 'X5', 'X6', 'X7', 'Z4'],
+    'BYD': ['Atto 3', 'Dolphin', 'F3', 'Han', 'Qin', 'Seal', 'Song', 'Tang', 'Yuan'],
+    'Cadillac': ['ATS', 'BLS', 'CT4', 'CT5', 'CT6', 'CTS', 'DeVille', 'Escalade', 'Seville', 'SRX', 'XT4', 'XT5', 'XT6', 'XTS'],
+    'Changan': ['Alsvin', 'CS35', 'CS55', 'CS75', 'Eado', 'Raeton', 'UNI-K', 'UNI-T', 'UNI-V'],
+    'Chery': ['Amulet', 'Arrizo 5', 'Arrizo 8', 'Bonus', 'Fora', 'IndiS', 'Kimo', 'M11', 'QQ', 'Tiggo 2', 'Tiggo 4', 'Tiggo 7 Pro', 'Tiggo 8 Pro'],
+    'Chevrolet': ['Aveo', 'Camaro', 'Captiva', 'Cobalt', 'Cruze', 'Epica', 'Equinox', 'Evanda', 'Impala', 'Lacetti', 'Lanos', 'Malibu', 'Niva', 'Orlando', 'Rezzo', 'Spark', 'Tahoe', 'Tracker', 'TrailBlazer'],
+    'Chrysler': ['200', '300C', 'Crossfire', 'Pacifica', 'PT Cruiser', 'Sebring', 'Town & Country', 'Voyager'],
+    'Citroen': ['Berlingo', 'C-Crosser', 'C-Elysee', 'C1', 'C2', 'C3', 'C3 Aircross', 'C4', 'C4 Picasso', 'C5', 'C5 Aircross', 'C6', 'DS3', 'DS4', 'DS5', 'Jumper', 'Jumpy', 'SpaceTourer'],
+    'Daewoo': ['Espero', 'Gentra', 'Lanos', 'Leganza', 'Matiz', 'Nexia', 'Nubira'],
+    'Daihatsu': ['Copen', 'Cuore', 'Materia', 'Mira', 'Move', 'Sirion', 'Terios', 'YRV'],
+    'Dodge': ['Avenger', 'Caliber', 'Caravan', 'Challenger', 'Charger', 'Dakota', 'Durango', 'Grand Caravan', 'Journey', 'Nitro', 'RAM', 'Viper'],
+    'Exeed': ['LX', 'TXL', 'VX'],
+    'FAW': ['Bestune B70', 'Bestune T77', 'V5', 'X40', 'X80'],
+    'Fiat': ['500', '500L', 'Albea', 'Brava', 'Bravo', 'Doblo', 'Ducato', 'Freemont', 'Grande Punto', 'Linea', 'Panda', 'Punto', 'Stilo', 'Tipo'],
+    'Ford': ['C-Max', 'EcoSport', 'Edge', 'Escape', 'Escort', 'Explorer', 'Fiesta', 'Focus', 'Fusion', 'Galaxy', 'Kuga', 'Mondeo', 'Mustang', 'Ranger', 'S-Max', 'Tourneo', 'Transit'],
+    'Geely': ['Atlas', 'Coolray', 'Emgrand', 'Emgrand EC7', 'GS', 'Monjaro', 'Okavango', 'Preface', 'Tugella', 'Vision', 'X7'],
+    'Genesis': ['G70', 'G80', 'G90', 'GV70', 'GV80'],
+    'GMC': ['Acadia', 'Envoy', 'Savana', 'Sierra', 'Terrain', 'Yukon'],
+    'Great Wall': ['Deer', 'Hover H3', 'Hover H5', 'Poer', 'Wingle'],
+    'Haval': ['Dargo', 'F7', 'F7x', 'H2', 'H5', 'H6', 'H9', 'Jolion', 'M6'],
+    'Honda': ['Accord', 'Airwave', 'City', 'Civic', 'CR-V', 'CR-Z', 'Crosstour', 'Fit', 'HR-V', 'Insight', 'Jazz', 'Legend', 'Odyssey', 'Pilot', 'Prelude', 'Ridgeline', 'Stepwgn', 'Stream'],
+    'Hyundai': ['Accent', 'Creta', 'Elantra', 'Galloper', 'Genesis', 'Getz', 'Grand Santa Fe', 'H-1', 'ix35', 'Kona', 'Matrix', 'Palisade', 'Santa Fe', 'Solaris', 'Sonata', 'Starex', 'Terracan', 'Tucson', 'Veloster'],
+    'Infiniti': ['EX', 'FX', 'G', 'JX', 'M', 'Q30', 'Q50', 'Q60', 'Q70', 'QX30', 'QX50', 'QX56', 'QX60', 'QX70', 'QX80'],
+    'Isuzu': ['D-Max', 'MU-X', 'Rodeo', 'Trooper'],
+    'JAC': ['J7', 'JS4', 'JS6', 'S3', 'S5', 'T6'],
+    'Jaguar': ['E-Pace', 'F-Pace', 'F-Type', 'S-Type', 'XE', 'XF', 'XJ', 'XK'],
+    'Jeep': ['Cherokee', 'Commander', 'Compass', 'Grand Cherokee', 'Liberty', 'Patriot', 'Renegade', 'Wrangler'],
+    'Jetour': ['Dashing', 'X70', 'X90'],
+    'Kia': ['Carens', 'Carnival', 'Ceed', 'Cerato', 'K5', 'K7', 'Mohave', 'Optima', 'Picanto', 'Rio', 'Seltos', 'Sorento', 'Soul', 'Sportage', 'Stinger'],
+    'LADA': ['2101', '2104', '2105', '2106', '2107', '2110', '2111', '2112', '2114', '2115', '4x4', 'Granta', 'Kalina', 'Largus', 'Niva', 'Priora', 'Samara', 'Vesta', 'XRAY'],
+    'Land Rover': ['Defender', 'Discovery', 'Discovery Sport', 'Freelander', 'Range Rover', 'Range Rover Evoque', 'Range Rover Sport', 'Range Rover Velar'],
+    'Lexus': ['CT', 'ES', 'GS', 'GX', 'HS', 'IS', 'LC', 'LS', 'LX', 'NX', 'RC', 'RX', 'SC', 'UX'],
+    'Lifan': ['Breez', 'Cebrium', 'Murman', 'Myway', 'Smily', 'Solano', 'X50', 'X60', 'X70'],
+    'Lincoln': ['Aviator', 'Continental', 'Corsair', 'MKC', 'MKS', 'MKT', 'MKX', 'MKZ', 'Navigator'],
+    'Mazda': ['2', '3', '5', '6', '626', 'BT-50', 'CX-3', 'CX-30', 'CX-5', 'CX-7', 'CX-9', 'Demio', 'MPV', 'MX-5', 'Premacy', 'Tribute'],
+    'Mercedes-Benz': ['A-Class', 'B-Class', 'C-Class', 'CLA', 'CLC', 'CLK', 'CLS', 'E-Class', 'G-Class', 'GLA', 'GLB', 'GLC', 'GLE', 'GLK', 'GLS', 'M-Class', 'S-Class', 'SL', 'Sprinter', 'V-Class', 'Viano'],
+    'Mini': ['Clubman', 'Cooper', 'Countryman', 'Coupe', 'Paceman', 'Roadster'],
+    'Mitsubishi': ['ASX', 'Carisma', 'Colt', 'Eclipse Cross', 'Galant', 'Grandis', 'L200', 'Lancer', 'Montero', 'Outlander', 'Pajero', 'Pajero Sport', 'Space Star'],
+    'Nissan': ['Almera', 'Armada', 'Juke', 'Leaf', 'Murano', 'Navara', 'Note', 'Pathfinder', 'Patrol', 'Primera', 'Qashqai', 'Sentra', 'Teana', 'Terrano', 'Tiida', 'X-Trail'],
+    'Omoda': ['C5', 'S5'],
+    'Opel': ['Antara', 'Astra', 'Combo', 'Corsa', 'Crossland', 'Frontera', 'Insignia', 'Meriva', 'Mokka', 'Omega', 'Signum', 'Vectra', 'Vivaro', 'Zafira'],
+    'Peugeot': ['107', '206', '207', '208', '3008', '301', '307', '308', '4007', '4008', '406', '407', '408', '5008', 'Partner', 'Traveller'],
+    'Porsche': ['718 Boxster', '718 Cayman', '911', 'Cayenne', 'Macan', 'Panamera', 'Taycan'],
+    'Ravon': ['Gentra', 'Matiz', 'Nexia R3', 'R2', 'R4'],
+    'Renault': ['Arkana', 'Captur', 'Clio', 'Duster', 'Fluence', 'Kangoo', 'Kaptur', 'Koleos', 'Laguna', 'Logan', 'Megane', 'Sandero', 'Scenic', 'Symbol', 'Talisman'],
+    'SEAT': ['Alhambra', 'Altea', 'Cordoba', 'Ibiza', 'Leon', 'Toledo'],
+    'Skoda': ['Fabia', 'Kamiq', 'Karoq', 'Kodiaq', 'Octavia', 'Rapid', 'Roomster', 'Suberb', 'Superb', 'Yeti'],
+    'Smart': ['ForFour', 'ForTwo', 'Roadster'],
+    'SsangYong': ['Actyon', 'Korando', 'Kyron', 'Musso', 'Rexton', 'Tivoli'],
+    'Subaru': ['Forester', 'Impreza', 'Legacy', 'Levorg', 'Outback', 'Tribeca', 'WRX', 'XV'],
+    'Suzuki': ['Alto', 'Baleno', 'Grand Vitara', 'Ignis', 'Jimny', 'Liana', 'SX4', 'Swift', 'Vitara', 'Wagon R'],
+    'Tesla': ['Model 3', 'Model S', 'Model X', 'Model Y'],
+    'Toyota': ['Alphard', 'Auris', 'Avensis', 'Camry', 'Corolla', 'Fortuner', 'Highlander', 'Hilux', 'Land Cruiser', 'Land Cruiser Prado', 'Prius', 'RAV4', 'Vitz', 'Yaris'],
+    'Volkswagen': ['Amarok', 'Caddy', 'Caravelle', 'Golf', 'Jetta', 'Multivan', 'Passat', 'Polo', 'Sharan', 'Taos', 'Teramont', 'Tiguan', 'Touareg', 'Transporter'],
+    'Volvo': ['C30', 'C40', 'S40', 'S60', 'S80', 'S90', 'V40', 'V60', 'V70', 'V90', 'XC40', 'XC60', 'XC70', 'XC90'],
+    'Voyah': ['Dream', 'Free'],
+    'Zeekr': ['001', 'X']
 }
-
 
 class User(db.Model):
     __tablename__ = 'users'
 
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(100), unique=True, nullable=False)
-    password = db.Column(db.String(200), nullable=False)
+    password = db.Column(db.String(255), nullable=False)
     role = db.Column(db.String(20), default='client')
     first_name = db.Column(db.String(100), nullable=True)
     last_name = db.Column(db.String(100), nullable=True)
@@ -59,7 +109,6 @@ class User(db.Model):
     consent_at = db.Column(db.DateTime, nullable=True)
 
     orders = db.relationship('Order', backref='user', lazy=True)
-
 
 class Order(db.Model):
     __tablename__ = 'orders'
@@ -73,7 +122,6 @@ class Order(db.Model):
     created_at = db.Column(db.DateTime, default=db.func.now())
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)
 
-
 class Review(db.Model):
     __tablename__ = 'reviews'
 
@@ -84,7 +132,6 @@ class Review(db.Model):
     is_published = db.Column(db.Boolean, default=True)
     created_at = db.Column(db.DateTime, default=db.func.now())
 
-
 def send_email(to_email, subject, html_message):
     smtp_host = os.getenv('MAIL_SERVER')
     smtp_port = int(os.getenv('MAIL_PORT', 587))
@@ -93,7 +140,8 @@ def send_email(to_email, subject, html_message):
     from_email = os.getenv('MAIL_FROM', smtp_user)
 
     if not smtp_host or not smtp_user or not smtp_password or not to_email:
-        return
+        print('EMAIL CONFIG ERROR: missing MAIL_* variables or recipient')
+        return False
 
     msg = MIMEMultipart()
     msg['From'] = from_email
@@ -107,9 +155,21 @@ def send_email(to_email, subject, html_message):
         server.login(smtp_user, smtp_password)
         server.send_message(msg)
         server.quit()
+        print(f'EMAIL SENT TO: {to_email}')
+        return True
     except Exception as e:
         print('Ошибка отправки email:', e)
+        return False
 
+def generate_reset_token(email):
+    return serializer.dumps(email, salt='password-reset-salt')
+
+def verify_reset_token(token, max_age=3600):
+    try:
+        email = serializer.loads(token, salt='password-reset-salt', max_age=max_age)
+        return email
+    except (SignatureExpired, BadSignature):
+        return None
 
 def login_required(f):
     @wraps(f)
@@ -118,7 +178,6 @@ def login_required(f):
             return redirect(url_for('login'))
         return f(*args, **kwargs)
     return decorated
-
 
 def admin_required(f):
     @wraps(f)
@@ -129,7 +188,6 @@ def admin_required(f):
         return f(*args, **kwargs)
     return decorated
 
-
 def manager_required(f):
     @wraps(f)
     def decorated(*args, **kwargs):
@@ -139,6 +197,30 @@ def manager_required(f):
         return f(*args, **kwargs)
     return decorated
 
+@app.route('/')
+def index():
+    reviews = Review.query.filter_by(is_published=True).order_by(Review.id.desc()).limit(6).all()
+    return render_template('index.html', reviews=reviews)
+
+@app.route('/services')
+def services():
+    return render_template('services.html')
+
+@app.route('/prices')
+def prices():
+    return render_template('prices.html', prices=PRICES)
+
+@app.route('/gallery')
+def gallery():
+    return render_template('gallery.html')
+
+@app.route('/contacts')
+def contacts():
+    return render_template('contacts.html')
+
+@app.route('/privacy')
+def privacy():
+    return render_template('privacy.html')
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -186,7 +268,7 @@ def register():
             <h2>Здравствуйте, {first_name} {last_name}!</h2>
             <p>Вы успешно зарегистрировались на сайте AutoKey.</p>
             <p>Ваш логин: <b>{username}</b></p>
-            <p>Теперь вы можете входить в личный кабинет и отслеживать свои заявки.</p>
+            <p>Теперь вы можете входить в личный кабинет и отслеживать заявки.</p>
             '''
         )
 
@@ -194,7 +276,6 @@ def register():
         return redirect(url_for('login'))
 
     return render_template('register.html')
-
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -222,6 +303,65 @@ def login():
 
     return render_template('login.html')
 
+@app.route('/forgot-password', methods=['GET', 'POST'])
+def forgot_password():
+    if request.method == 'POST':
+        email = request.form['email'].strip().lower()
+        user = User.query.filter_by(email=email).first()
+
+        if user:
+            token = generate_reset_token(user.email)
+            reset_link = url_for('reset_password', token=token, _external=True)
+
+            send_email(
+                user.email,
+                'Сброс пароля AutoKey',
+                f'''
+                <h2>Сброс пароля</h2>
+                <p>Вы запросили восстановление пароля.</p>
+                <p>Нажмите на ссылку ниже:</p>
+                <p><a href="{reset_link}">{reset_link}</a></p>
+                <p>Ссылка действует 1 час.</p>
+                '''
+            )
+
+        flash('Если такой email есть в системе, ссылка для сброса уже отправлена.')
+        return redirect(url_for('login'))
+
+    return render_template('forgot_password.html')
+
+@app.route('/reset-password/<token>', methods=['GET', 'POST'])
+def reset_password(token):
+    email = verify_reset_token(token)
+
+    if not email:
+        flash('Ссылка недействительна или срок её действия истёк.')
+        return redirect(url_for('forgot_password'))
+
+    user = User.query.filter_by(email=email).first()
+    if not user:
+        flash('Пользователь не найден.')
+        return redirect(url_for('forgot_password'))
+
+    if request.method == 'POST':
+        password = request.form['password'].strip()
+        confirm_password = request.form['confirm_password'].strip()
+
+        if len(password) < 6:
+            flash('Пароль должен быть не короче 6 символов.')
+            return render_template('reset_password.html', token=token)
+
+        if password != confirm_password:
+            flash('Пароли не совпадают.')
+            return render_template('reset_password.html', token=token)
+
+        user.password = generate_password_hash(password)
+        db.session.commit()
+
+        flash('Пароль успешно обновлён. Теперь войдите.')
+        return redirect(url_for('login'))
+
+    return render_template('reset_password.html', token=token)
 
 @app.route('/admin/login', methods=['GET', 'POST'])
 def admin_login():
@@ -251,13 +391,11 @@ def admin_login():
 
     return render_template('admin_login.html')
 
-
 @app.route('/logout')
 def logout():
     session.clear()
     flash('Вы вышли из аккаунта.')
     return redirect(url_for('index'))
-
 
 @app.route('/admin/logout')
 def admin_logout():
@@ -265,44 +403,11 @@ def admin_logout():
     flash('Вы вышли из панели персонала.')
     return redirect(url_for('admin_login'))
 
-
 @app.route('/my-orders')
 @login_required
 def my_orders():
     orders = Order.query.filter_by(user_id=session['user_id']).order_by(Order.id.desc()).all()
     return render_template('myorders.html', orders=orders)
-
-
-@app.route('/')
-def index():
-    reviews = Review.query.filter_by(is_published=True).order_by(Review.id.desc()).limit(6).all()
-    return render_template('index.html', reviews=reviews)
-
-
-@app.route('/services')
-def services():
-    return render_template('services.html')
-
-
-@app.route('/prices')
-def prices():
-    return render_template('prices.html', prices=PRICES)
-
-
-@app.route('/gallery')
-def gallery():
-    return render_template('gallery.html')
-
-
-@app.route('/contacts')
-def contacts():
-    return render_template('contacts.html')
-
-
-@app.route('/privacy')
-def privacy():
-    return render_template('privacy.html')
-
 
 @app.route('/contact', methods=['GET', 'POST'])
 def contact():
@@ -320,13 +425,13 @@ def contact():
 
         full_name = f'{first_name} {last_name}'.strip()
 
-        valid_models = CAR_BRANDS.get(brand, [])
-        if car_model not in valid_models:
-            flash('Выберите реальную модель автомобиля из списка.')
+        if not re.fullmatch(r'\+7[0-9]{10}', phone):
+            flash('Введите номер телефона строго в формате +79991234567')
             return render_template('contact.html', user=current_user, car_brands=CAR_BRANDS)
 
-        if not re.fullmatch(r'\+7[0-9]{10}', phone):
-            flash('Введите номер телефона в формате +79991234567')
+        valid_models = CAR_BRANDS.get(brand, [])
+        if car_model not in valid_models:
+            flash('Выберите модель автомобиля только из списка.')
             return render_template('contact.html', user=current_user, car_brands=CAR_BRANDS)
 
         order = Order(
@@ -357,7 +462,6 @@ def contact():
 
     return render_template('contact.html', user=current_user, car_brands=CAR_BRANDS)
 
-
 @app.route('/reviews', methods=['GET', 'POST'])
 def reviews():
     if request.method == 'POST':
@@ -366,23 +470,18 @@ def reviews():
             return redirect(url_for('login'))
 
         author = request.form['author'].strip()
-        text = request.form['text'].strip()
+        text_review = request.form['text'].strip()
         rating = int(request.form['rating'])
 
-        review = Review(
-            author=author,
-            text=text,
-            rating=rating,
-            is_published=True
-        )
+        review = Review(author=author, text=text_review, rating=rating, is_published=True)
         db.session.add(review)
         db.session.commit()
+
         flash('Спасибо! Ваш отзыв опубликован.')
         return redirect(url_for('reviews'))
 
     reviews_list = Review.query.filter_by(is_published=True).order_by(Review.id.desc()).all()
     return render_template('reviews.html', reviews=reviews_list)
-
 
 @app.route('/admin')
 @manager_required
@@ -402,13 +501,11 @@ def admin_dashboard():
         reviews_count=reviews_count
     )
 
-
 @app.route('/admin/orders')
 @manager_required
 def admin_orders():
     orders = Order.query.order_by(Order.id.desc()).all()
     return render_template('admin/orders.html', orders=orders)
-
 
 @app.route('/admin/order/<int:id>/status', methods=['POST'])
 @manager_required
@@ -436,7 +533,6 @@ def admin_order_status(id):
     flash('Статус заявки обновлён.')
     return redirect(url_for('admin_orders'))
 
-
 @app.route('/admin/order/<int:id>/delete', methods=['POST'])
 @admin_required
 def admin_order_delete(id):
@@ -445,7 +541,6 @@ def admin_order_delete(id):
     db.session.commit()
     flash('Заявка удалена.')
     return redirect(url_for('admin_orders'))
-
 
 @app.route('/admin/prices', methods=['GET', 'POST'])
 @manager_required
@@ -468,13 +563,11 @@ def admin_prices():
 
     return render_template('admin/prices.html', prices=PRICES)
 
-
 @app.route('/admin/reviews')
 @manager_required
 def admin_reviews():
     reviews_list = Review.query.order_by(Review.id.desc()).all()
     return render_template('admin/reviews.html', reviews=reviews_list)
-
 
 @app.route('/admin/review/<int:id>/toggle', methods=['POST'])
 @manager_required
@@ -483,7 +576,6 @@ def admin_review_toggle(id):
     review.is_published = not review.is_published
     db.session.commit()
     return redirect(url_for('admin_reviews'))
-
 
 @app.route('/admin/review/<int:id>/delete', methods=['POST'])
 @admin_required
@@ -494,13 +586,11 @@ def admin_review_delete(id):
     flash('Отзыв удалён.')
     return redirect(url_for('admin_reviews'))
 
-
 @app.route('/admin/users')
 @admin_required
 def admin_users():
     users = User.query.all()
     return render_template('admin/users.html', users=users)
-
 
 @app.route('/admin/user/<int:id>/role', methods=['POST'])
 @admin_required
@@ -510,7 +600,6 @@ def admin_user_role(id):
     db.session.commit()
     flash('Роль пользователя обновлена.')
     return redirect(url_for('admin_users'))
-
 
 def add_missing_columns():
     with db.engine.connect() as conn:
@@ -527,7 +616,6 @@ def add_missing_columns():
         if 'consent_at' not in columns:
             conn.execute(text("ALTER TABLE users ADD COLUMN consent_at DATETIME"))
         conn.commit()
-
 
 with app.app_context():
     db.create_all()
@@ -558,7 +646,6 @@ with app.app_context():
         )
         db.session.add(manager_user)
         db.session.commit()
-
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=80)
