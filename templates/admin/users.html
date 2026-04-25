@@ -46,50 +46,52 @@
         <section class="table-card">
             <div class="section-head">
                 <h2>Список пользователей</h2>
-                <p>Изменение роли доступно только администратору, что соответствует логике доступа в твоём приложении.</p>
+                <p>Изменение роли доступно только администратору, что соответствует логике доступа в приложении.</p>
             </div>
 
             {% if users %}
-            <table>
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Логин</th>
-                        <th>Текущая роль</th>
-                        <th>Роль в интерфейсе</th>
-                        <th>Действие</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for user in users %}
-                    <tr>
-                        <td>#{{ user.id }}</td>
-                        <td>{{ user.username }}</td>
-                        <td>
-                            {% if user.role == 'admin' %}
-                                <span class="status done">admin</span>
-                            {% elif user.role == 'manager' %}
-                                <span class="status">manager</span>
-                            {% else %}
-                                <span class="status hidden">client</span>
-                            {% endif %}
-                        </td>
-                        <td style="min-width: 220px;">
-                            <form method="POST" action="{{ url_for('admin_user_role', id=user.id) }}" style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
-                                <select name="role">
-                                    <option value="client" {% if user.role == 'client' %}selected{% endif %}>client</option>
-                                    <option value="manager" {% if user.role == 'manager' %}selected{% endif %}>manager</option>
-                                    <option value="admin" {% if user.role == 'admin' %}selected{% endif %}>admin</option>
-                                </select>
-                        </td>
-                        <td>
-                                <button type="submit">Сохранить роль</button>
-                            </form>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+            <div class="table-wrap">
+                <table class="admin-users-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Логин</th>
+                            <th>Текущая роль</th>
+                            <th>Изменить роль</th>
+                            <th>Действие</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for user in users %}
+                        <tr>
+                            <td>#{{ user.id }}</td>
+                            <td class="user-name-cell">{{ user.username }}</td>
+                            <td>
+                                {% if user.role == 'admin' %}
+                                    <span class="status done">admin</span>
+                                {% elif user.role == 'manager' %}
+                                    <span class="status">manager</span>
+                                {% else %}
+                                    <span class="status hidden">client</span>
+                                {% endif %}
+                            </td>
+                            <td class="role-cell">
+                                <form method="POST" action="{{ url_for('admin_user_role', id=user.id) }}" class="user-role-form" id="user-role-form-{{ user.id }}">
+                                    <select name="role">
+                                        <option value="client" {% if user.role == 'client' %}selected{% endif %}>client</option>
+                                        <option value="manager" {% if user.role == 'manager' %}selected{% endif %}>manager</option>
+                                        <option value="admin" {% if user.role == 'admin' %}selected{% endif %}>admin</option>
+                                    </select>
+                                </form>
+                            </td>
+                            <td class="action-button-cell">
+                                <button type="submit" form="user-role-form-{{ user.id }}">Сохранить роль</button>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
             {% else %}
             <div class="info-card">
                 <h3>Пользователей пока нет</h3>
