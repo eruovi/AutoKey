@@ -28,7 +28,7 @@
                             <th>ID</th>
                             <th>Клиент</th>
                             <th>Телефон</th>
-                            <th>Авто</th>
+                            <th>Автомобиль</th>
                             <th>Услуга</th>
                             <th class="date-cell">Дата</th>
                             <th class="status-cell">Статус</th>
@@ -67,8 +67,8 @@
                                     </form>
 
                                     {% if session.get('role') == 'admin' %}
-                                    <form method="POST" action="{{ url_for('admin_order_delete', id=order.id) }}">
-                                        <button type="submit" class="btn-danger" onclick="return confirm('Удалить заявку?');">Удалить заявку</button>
+                                    <form method="POST" action="{{ url_for('admin_order_delete', id=order.id) }}" onsubmit="return confirm('Удалить заявку?');">
+                                        <button type="submit" class="btn-danger">Удалить заявку</button>
                                     </form>
                                     {% endif %}
                                 </div>
@@ -81,7 +81,7 @@
             {% else %}
             <div class="info-card">
                 <h3>Заявок пока нет</h3>
-                <p>Новые заявки клиентов появятся здесь.</p>
+                <p>Когда клиенты оставят заявки, они появятся здесь.</p>
             </div>
             {% endif %}
         </section>
