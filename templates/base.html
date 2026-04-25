@@ -887,6 +887,7 @@
                 <a href="{{ url_for('reviews') }}">Отзывы</a>
                 <a href="{{ url_for('contacts') }}">Контакты</a>
                 <a href="{{ url_for('contact') }}">Заявка</a>
+                <a href="{{ url_for('privacy') }}">Политика</a>
             </nav>
 
             <div class="nav-actions" id="mobileActions">
@@ -916,7 +917,16 @@
 
     <footer class="footer">
         <div class="footer-inner reveal">
-            Автоключи 33 • Изготовление ключей, аварийное вскрытие, ремонт замков и помощь по Владимиру и области.
+            <div style="display:flex; flex-wrap:wrap; gap:14px; justify-content:space-between; align-items:center;">
+                <div>
+                    Автоключи 33 • Изготовление ключей, аварийное вскрытие, ремонт замков и помощь по Владимиру и области.
+                </div>
+                <div style="display:flex; gap:14px; flex-wrap:wrap;">
+                    <a href="{{ url_for('privacy') }}">Политика конфиденциальности</a>
+                    <a href="{{ url_for('contacts') }}">Контакты</a>
+                    <a href="{{ url_for('contact') }}">Оставить заявку</a>
+                </div>
+            </div>
         </div>
     </footer>
 
