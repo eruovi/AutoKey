@@ -1,4 +1,4 @@
-{% extends 'base.html' %}
+{% extends 'admin/base.html' %}
 {% block title %}Обзор | Админ-панель{% endblock %}
 {% block content %}
 
@@ -87,38 +87,40 @@
             </div>
 
             {% if orders %}
-            <table>
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Имя</th>
-                        <th>Телефон</th>
-                        <th>Автомобиль</th>
-                        <th>Услуга</th>
-                        <th>Статус</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for order in orders[:10] %}
-                    <tr>
-                        <td>#{{ order.id }}</td>
-                        <td>{{ order.name }}</td>
-                        <td>{{ order.phone }}</td>
-                        <td>{{ order.car_model }}</td>
-                        <td>{{ order.service }}</td>
-                        <td>
-                            {% if order.status == 'выполнена' %}
-                                <span class="status done">{{ order.status }}</span>
-                            {% elif order.status == 'в работе' %}
-                                <span class="status">{{ order.status }}</span>
-                            {% else %}
-                                <span class="status hidden">{{ order.status }}</span>
-                            {% endif %}
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+            <div class="table-wrap">
+                <table class="admin-orders-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Имя</th>
+                            <th>Телефон</th>
+                            <th>Автомобиль</th>
+                            <th>Услуга</th>
+                            <th>Статус</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for order in orders[:10] %}
+                        <tr>
+                            <td>#{{ order.id }}</td>
+                            <td class="user-name-cell">{{ order.name }}</td>
+                            <td>{{ order.phone }}</td>
+                            <td class="text-cell">{{ order.car_model }}</td>
+                            <td class="text-cell">{{ order.service }}</td>
+                            <td>
+                                {% if order.status == 'выполнена' %}
+                                    <span class="status done">{{ order.status }}</span>
+                                {% elif order.status == 'в работе' %}
+                                    <span class="status">{{ order.status }}</span>
+                                {% else %}
+                                    <span class="status hidden">{{ order.status }}</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
 
             <div style="margin-top: 18px; display:flex; gap:12px; flex-wrap:wrap;">
                 <a href="{{ url_for('admin_orders') }}" class="btn btn-primary">Открыть все заявки</a>
