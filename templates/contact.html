@@ -9,7 +9,7 @@
             <p>Заполните форму, и мы свяжемся с вами для уточнения деталей по автомобилю, ключу или выезду мастера.</p>
         </div>
 
-        <form method="POST" class="contact-form">
+        <form method="POST" class="contact-form" novalidate>
             <div class="form-grid">
                 <div class="form-group">
                     <label class="form-label" for="name">Ваше имя</label>
@@ -32,8 +32,11 @@
                             type="tel"
                             id="phone"
                             name="phone"
-                            placeholder="+7 (999) 000-00-00"
+                            placeholder="+7 (___) ___-__-__"
                             value="{{ request.form.get('phone', '') }}"
+                            inputmode="numeric"
+                            autocomplete="tel"
+                            maxlength="18"
                             required
                         >
                     </div>
@@ -42,68 +45,19 @@
 
             <div class="form-grid">
                 <div class="form-group">
-                    <label class="form-label" for="brand">Марка авто</label>
-                    <div class="input-shell select-shell">
-                        <select id="brand" name="brand" required>
-                            <option value="">Выберите марку</option>
-                            <option value="Audi" {% if request.form.get('brand') == 'Audi' %}selected{% endif %}>Audi</option>
-                            <option value="BMW" {% if request.form.get('brand') == 'BMW' %}selected{% endif %}>BMW</option>
-                            <option value="Chevrolet" {% if request.form.get('brand') == 'Chevrolet' %}selected{% endif %}>Chevrolet</option>
-                            <option value="Chery" {% if request.form.get('brand') == 'Chery' %}selected{% endif %}>Chery</option>
-                            <option value="Citroen" {% if request.form.get('brand') == 'Citroen' %}selected{% endif %}>Citroen</option>
-                            <option value="Daewoo" {% if request.form.get('brand') == 'Daewoo' %}selected{% endif %}>Daewoo</option>
-                            <option value="Ford" {% if request.form.get('brand') == 'Ford' %}selected{% endif %}>Ford</option>
-                            <option value="Geely" {% if request.form.get('brand') == 'Geely' %}selected{% endif %}>Geely</option>
-                            <option value="Honda" {% if request.form.get('brand') == 'Honda' %}selected{% endif %}>Honda</option>
-                            <option value="Hyundai" {% if request.form.get('brand') == 'Hyundai' %}selected{% endif %}>Hyundai</option>
-                            <option value="Kia" {% if request.form.get('brand') == 'Kia' %}selected{% endif %}>Kia</option>
-                            <option value="Lada" {% if request.form.get('brand') == 'Lada' %}selected{% endif %}>Lada</option>
-                            <option value="Lexus" {% if request.form.get('brand') == 'Lexus' %}selected{% endif %}>Lexus</option>
-                            <option value="Mazda" {% if request.form.get('brand') == 'Mazda' %}selected{% endif %}>Mazda</option>
-                            <option value="Mercedes-Benz" {% if request.form.get('brand') == 'Mercedes-Benz' %}selected{% endif %}>Mercedes-Benz</option>
-                            <option value="Mitsubishi" {% if request.form.get('brand') == 'Mitsubishi' %}selected{% endif %}>Mitsubishi</option>
-                            <option value="Nissan" {% if request.form.get('brand') == 'Nissan' %}selected{% endif %}>Nissan</option>
-                            <option value="Opel" {% if request.form.get('brand') == 'Opel' %}selected{% endif %}>Opel</option>
-                            <option value="Peugeot" {% if request.form.get('brand') == 'Peugeot' %}selected{% endif %}>Peugeot</option>
-                            <option value="Renault" {% if request.form.get('brand') == 'Renault' %}selected{% endif %}>Renault</option>
-                            <option value="Skoda" {% if request.form.get('brand') == 'Skoda' %}selected{% endif %}>Skoda</option>
-                            <option value="Toyota" {% if request.form.get('brand') == 'Toyota' %}selected{% endif %}>Toyota</option>
-                            <option value="Volkswagen" {% if request.form.get('brand') == 'Volkswagen' %}selected{% endif %}>Volkswagen</option>
-                            <option value="Volvo" {% if request.form.get('brand') == 'Volvo' %}selected{% endif %}>Volvo</option>
-                            <option value="Другая" {% if request.form.get('brand') == 'Другая' %}selected{% endif %}>Другая</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label" for="year">Год выпуска</label>
+                    <label class="form-label" for="email">Email</label>
                     <div class="input-shell">
                         <input
-                            type="text"
-                            id="year"
-                            name="year"
-                            placeholder="Например: 2014"
-                            value="{{ request.form.get('year', '') }}"
+                            type="email"
+                            id="email"
+                            name="email"
+                            placeholder="example@mail.com"
+                            value="{{ request.form.get('email', '') }}"
+                            inputmode="email"
+                            autocomplete="email"
+                            pattern="[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}"
+                            title="Используйте только латинские буквы, цифры и символы email"
                         >
-                    </div>
-                </div>
-            </div>
-
-            <div class="form-grid">
-                <div class="form-group">
-                    <label class="form-label" for="service">Нужная услуга</label>
-                    <div class="input-shell select-shell">
-                        <select id="service" name="service" required>
-                            <option value="">Выберите услугу</option>
-                            <option value="Изготовление ключа" {% if request.form.get('service') == 'Изготовление ключа' %}selected{% endif %}>Изготовление ключа</option>
-                            <option value="Программирование ключа" {% if request.form.get('service') == 'Программирование ключа' %}selected{% endif %}>Программирование ключа</option>
-                            <option value="Вскрытие автомобиля" {% if request.form.get('service') == 'Вскрытие автомобиля' %}selected{% endif %}>Вскрытие автомобиля</option>
-                            <option value="Ремонт корпуса ключа" {% if request.form.get('service') == 'Ремонт корпуса ключа' %}selected{% endif %}>Ремонт корпуса ключа</option>
-                            <option value="Замена батарейки" {% if request.form.get('service') == 'Замена батарейки' %}selected{% endif %}>Замена батарейки</option>
-                            <option value="Отключение утерянных ключей" {% if request.form.get('service') == 'Отключение утерянных ключей' %}selected{% endif %}>Отключение утерянных ключей</option>
-                            <option value="Аварийный выезд" {% if request.form.get('service') == 'Аварийный выезд' %}selected{% endif %}>Аварийный выезд</option>
-                            <option value="Другое" {% if request.form.get('service') == 'Другое' %}selected{% endif %}>Другое</option>
-                        </select>
                     </div>
                 </div>
 
@@ -116,6 +70,112 @@
                             name="city"
                             placeholder="Например: Александров"
                             value="{{ request.form.get('city', '') }}"
+                        >
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-grid">
+                <div class="form-group">
+                    <label class="form-label" for="brand">Марка авто</label>
+                    <div class="input-shell select-shell">
+                        <select id="brand" name="brand" required>
+                            <option value="">Выберите марку</option>
+                            <option value="Audi">Audi</option>
+                            <option value="BMW">BMW</option>
+                            <option value="Chevrolet">Chevrolet</option>
+                            <option value="Chery">Chery</option>
+                            <option value="Citroen">Citroen</option>
+                            <option value="Daewoo">Daewoo</option>
+                            <option value="Ford">Ford</option>
+                            <option value="Geely">Geely</option>
+                            <option value="Honda">Honda</option>
+                            <option value="Hyundai">Hyundai</option>
+                            <option value="Kia">Kia</option>
+                            <option value="Lada">Lada</option>
+                            <option value="Lexus">Lexus</option>
+                            <option value="Mazda">Mazda</option>
+                            <option value="Mercedes-Benz">Mercedes-Benz</option>
+                            <option value="Mitsubishi">Mitsubishi</option>
+                            <option value="Nissan">Nissan</option>
+                            <option value="Opel">Opel</option>
+                            <option value="Peugeot">Peugeot</option>
+                            <option value="Renault">Renault</option>
+                            <option value="Skoda">Skoda</option>
+                            <option value="Toyota">Toyota</option>
+                            <option value="Volkswagen">Volkswagen</option>
+                            <option value="Volvo">Volvo</option>
+                            <option value="Другая">Другая</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="model">Модель авто</label>
+                    <div class="input-shell select-shell">
+                        <select id="model" name="model" required>
+                            <option value="">Сначала выберите марку</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-grid">
+                <div class="form-group">
+                    <label class="form-label" for="year">Год выпуска</label>
+                    <div class="input-shell">
+                        <input
+                            type="text"
+                            id="year"
+                            name="year"
+                            placeholder="Например: 2014"
+                            value="{{ request.form.get('year', '') }}"
+                            inputmode="numeric"
+                        >
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="service">Нужная услуга</label>
+                    <div class="input-shell select-shell">
+                        <select id="service" name="service" required>
+                            <option value="">Выберите услугу</option>
+                            <option value="Изготовление ключа">Изготовление ключа</option>
+                            <option value="Программирование ключа">Программирование ключа</option>
+                            <option value="Вскрытие автомобиля">Вскрытие автомобиля</option>
+                            <option value="Ремонт корпуса ключа">Ремонт корпуса ключа</option>
+                            <option value="Замена батарейки">Замена батарейки</option>
+                            <option value="Отключение утерянных ключей">Отключение утерянных ключей</option>
+                            <option value="Аварийный выезд">Аварийный выезд</option>
+                            <option value="Другое">Другое</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-grid">
+                <div class="form-group">
+                    <label class="form-label" for="vin">VIN / если есть</label>
+                    <div class="input-shell">
+                        <input
+                            type="text"
+                            id="vin"
+                            name="vin"
+                            placeholder="Например: XTA..."
+                            value="{{ request.form.get('vin', '') }}"
+                        >
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="reg_number">Госномер / если есть</label>
+                    <div class="input-shell">
+                        <input
+                            type="text"
+                            id="reg_number"
+                            name="reg_number"
+                            placeholder="Например: А123АА33"
+                            value="{{ request.form.get('reg_number', '') }}"
                         >
                     </div>
                 </div>
@@ -149,6 +209,125 @@
     </section>
 </div>
 
+<script>
+const carModels = {
+    "Audi": ["A3", "A4", "A5", "A6", "A7", "A8", "Q3", "Q5", "Q7", "Q8", "TT"],
+    "BMW": ["1 Series", "3 Series", "5 Series", "7 Series", "X1", "X3", "X5", "X6"],
+    "Chevrolet": ["Aveo", "Cruze", "Lacetti", "Captiva", "Niva"],
+    "Chery": ["Amulet", "Tiggo 4", "Tiggo 7", "Tiggo 8", "Arrizo"],
+    "Citroen": ["C3", "C4", "C5", "Berlingo", "Jumper"],
+    "Daewoo": ["Matiz", "Nexia", "Lanos", "Espero"],
+    "Ford": ["Focus", "Fiesta", "Mondeo", "Kuga", "Transit"],
+    "Geely": ["Coolray", "Atlas", "Emgrand", "Tugella"],
+    "Honda": ["Civic", "Accord", "CR-V", "Fit", "Pilot"],
+    "Hyundai": ["Accent", "Elantra", "Solaris", "Creta", "Santa Fe", "Tucson"],
+    "Kia": ["Rio", "Ceed", "Cerato", "Sportage", "Sorento", "Optima"],
+    "Lada": ["Granta", "Vesta", "Kalina", "Priora", "Largus", "Niva"],
+    "Lexus": ["ES", "GS", "GX", "IS", "LX", "NX", "RX"],
+    "Mazda": ["Mazda 3", "Mazda 6", "CX-5", "CX-7", "CX-9"],
+    "Mercedes-Benz": ["A-Class", "C-Class", "E-Class", "S-Class", "GLA", "GLC", "GLE", "Sprinter"],
+    "Mitsubishi": ["Lancer", "Outlander", "ASX", "Pajero", "L200"],
+    "Nissan": ["Almera", "Qashqai", "X-Trail", "Note", "Teana", "Patrol"],
+    "Opel": ["Astra", "Corsa", "Insignia", "Vectra", "Zafira"],
+    "Peugeot": ["206", "207", "308", "407", "3008", "Partner"],
+    "Renault": ["Logan", "Sandero", "Duster", "Megane", "Fluence", "Kaptur"],
+    "Skoda": ["Fabia", "Octavia", "Rapid", "Superb", "Kodiaq", "Yeti"],
+    "Toyota": ["Camry", "Corolla", "Avensis", "RAV4", "Land Cruiser", "Prado"],
+    "Volkswagen": ["Polo", "Golf", "Passat", "Jetta", "Tiguan", "Touareg"],
+    "Volvo": ["S40", "S60", "S80", "XC60", "XC70", "XC90"],
+    "Другая": ["Укажу в комментарии"]
+};
+
+const brandSelect = document.getElementById('brand');
+const modelSelect = document.getElementById('model');
+const phoneInput = document.getElementById('phone');
+const emailInput = document.getElementById('email');
+
+const selectedBrand = "{{ request.form.get('brand', '') }}";
+const selectedModel = "{{ request.form.get('model', '') }}";
+
+function updateModels(brand, selected = "") {
+    modelSelect.innerHTML = "";
+
+    if (!brand || !carModels[brand]) {
+        modelSelect.innerHTML = '<option value="">Сначала выберите марку</option>';
+        return;
+    }
+
+    const firstOption = document.createElement('option');
+    firstOption.value = "";
+    firstOption.textContent = "Выберите модель";
+    modelSelect.appendChild(firstOption);
+
+    carModels[brand].forEach(model => {
+        const option = document.createElement('option');
+        option.value = model;
+        option.textContent = model;
+        if (model === selected) option.selected = true;
+        modelSelect.appendChild(option);
+    });
+}
+
+brandSelect.addEventListener('change', function () {
+    updateModels(this.value);
+});
+
+if (selectedBrand) {
+    brandSelect.value = selectedBrand;
+    updateModels(selectedBrand, selectedModel);
+}
+
+function maskPhone(value) {
+    let digits = value.replace(/\D/g, '');
+
+    if (digits.startsWith('8')) digits = '7' + digits.slice(1);
+    if (!digits.startsWith('7')) digits = '7' + digits.replace(/^7*/, '');
+    digits = digits.slice(0, 11);
+
+    let result = '+7';
+    if (digits.length > 1) result += ' (' + digits.slice(1, 4);
+    if (digits.length >= 4) result += ') ' + digits.slice(4, 7);
+    if (digits.length >= 7) result += '-' + digits.slice(7, 9);
+    if (digits.length >= 9) result += '-' + digits.slice(9, 11);
+
+    return result;
+}
+
+phoneInput.addEventListener('input', function () {
+    this.value = maskPhone(this.value);
+});
+
+phoneInput.addEventListener('focus', function () {
+    if (!this.value) this.value = '+7';
+});
+
+phoneInput.addEventListener('blur', function () {
+    if (this.value === '+7') this.value = '';
+});
+
+emailInput.addEventListener('input', function () {
+    this.value = this.value.replace(/[^A-Za-z0-9@._%+-]/g, '');
+});
+
+document.querySelector('.contact-form').addEventListener('submit', function (e) {
+    const phoneDigits = phoneInput.value.replace(/\D/g, '');
+    const emailValue = emailInput.value.trim();
+
+    if (phoneDigits.length !== 11) {
+        e.preventDefault();
+        phoneInput.focus();
+        alert('Введите телефон полностью в формате +7 (999) 999-99-99');
+        return;
+    }
+
+    if (emailValue && !/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/.test(emailValue)) {
+        e.preventDefault();
+        emailInput.focus();
+        alert('Email должен содержать только латинские буквы и корректный формат адреса');
+    }
+});
+</script>
+
 <style>
 .contact-form {
     display: flex;
@@ -169,11 +348,12 @@
     border: 1px solid rgba(255,255,255,.10);
     transition: var(--transition);
     overflow: hidden;
+    backdrop-filter: blur(14px);
 }
 
 .input-shell:focus-within {
-    border-color: rgba(109,124,255,.72);
-    box-shadow: 0 0 0 4px rgba(109,124,255,.14);
+    border-color: rgba(21,209,197,.35);
+    box-shadow: 0 0 0 4px rgba(21,209,197,.10);
     background: rgba(255,255,255,.08);
 }
 
@@ -193,6 +373,12 @@
 
 .input-shell select {
     cursor: pointer;
+    color: #f3f7ff !important;
+}
+
+.input-shell select option {
+    background: #0d1b2d;
+    color: #f3f7ff;
 }
 
 .input-shell textarea {
