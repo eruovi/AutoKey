@@ -83,6 +83,7 @@
 <style>
     .location-section {
         padding: 30px;
+        color: #f3f7ff;
     }
 
     .location-head {
@@ -102,11 +103,12 @@
         margin: 0 0 8px;
         font-size: 34px;
         line-height: 1.05;
+        color: #f3f7ff;
     }
 
     .location-head p {
         margin: 0;
-        color: var(--muted);
+        color: rgba(243, 247, 255, 0.76);
         max-width: 760px;
         line-height: 1.7;
     }
@@ -122,11 +124,13 @@
         display: flex;
         gap: 14px;
         align-items: flex-start;
-        background: linear-gradient(180deg, rgba(255,255,255,.94) 0%, rgba(248,250,252,.94) 100%);
-        border: 1px solid rgba(229,231,235,.95);
+        background: rgba(10, 24, 42, 0.92);
+        border: 1px solid rgba(255, 255, 255, 0.10);
         border-radius: 22px;
         padding: 20px;
-        box-shadow: 0 12px 30px rgba(15, 23, 42, 0.06);
+        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.20);
+        backdrop-filter: blur(14px);
+        -webkit-backdrop-filter: blur(14px);
     }
 
     .location-info-icon {
@@ -135,8 +139,8 @@
         border-radius: 14px;
         display: grid;
         place-items: center;
-        background: rgba(15,118,110,.10);
-        color: #0f766e;
+        background: rgba(21, 209, 197, 0.12);
+        color: #6fe7df;
         font-size: 20px;
         flex-shrink: 0;
     }
@@ -146,7 +150,7 @@
         font-weight: 800;
         letter-spacing: .04em;
         text-transform: uppercase;
-        color: #9ca3af;
+        color: rgba(191, 208, 226, 0.72);
         margin-bottom: 6px;
     }
 
@@ -154,7 +158,7 @@
         font-size: 18px;
         font-weight: 700;
         line-height: 1.45;
-        color: #111827;
+        color: #f3f7ff;
     }
 
     .location-map-wrap {
@@ -176,8 +180,9 @@
         gap: 8px;
         padding: 10px 16px;
         border-radius: 999px;
-        background: rgba(15,118,110,.10);
-        color: #0f766e;
+        background: rgba(21, 209, 197, 0.12);
+        border: 1px solid rgba(21, 209, 197, 0.18);
+        color: #7ceae2;
         font-weight: 800;
     }
 
@@ -190,15 +195,18 @@
         position: relative;
         border-radius: 26px;
         overflow: hidden;
-        border: 1px solid rgba(229,231,235,.95);
-        box-shadow: 0 18px 40px rgba(15, 23, 42, 0.08);
-        background: #fff;
+        border: 1px solid rgba(255, 255, 255, 0.10);
+        box-shadow: 0 18px 40px rgba(0, 0, 0, 0.24);
+        background: rgba(10, 24, 42, 0.92);
+        backdrop-filter: blur(14px);
+        -webkit-backdrop-filter: blur(14px);
     }
 
     .location-map-card iframe {
         display: block;
         width: 100%;
         height: 460px;
+        background: #17202b;
     }
 
     .location-map-floating-btn {
@@ -208,18 +216,22 @@
         display: inline-flex;
         align-items: center;
         gap: 8px;
-        background: #ffffff;
-        color: #111827;
+        background: rgba(10, 24, 42, 0.92);
+        color: #f3f7ff;
         text-decoration: none;
         padding: 12px 18px;
         border-radius: 999px;
         font-weight: 700;
-        box-shadow: 0 12px 30px rgba(15, 23, 42, 0.18);
-        border: 1px solid rgba(229,231,235,.95);
+        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.24);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
     }
 
     .location-map-floating-btn:hover {
-        background: #f8fafc;
+        background: rgba(16, 35, 58, 0.98);
+        border-color: rgba(21, 209, 197, 0.28);
+        color: #ffffff;
     }
 
     @media (max-width: 1024px) {
