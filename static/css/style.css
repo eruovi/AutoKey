@@ -1051,3 +1051,52 @@ tr:hover td {
     }
 }
 }
+.feature-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px;
+}
+
+.feature-card {
+    display: block;
+    padding: 22px;
+    border-radius: 22px;
+    background: linear-gradient(180deg, #172033 0%, #111827 100%);
+    border: 1px solid var(--line);
+    box-shadow: var(--shadow);
+    color: #e5e7eb;
+    transition: .2s ease;
+}
+
+.feature-card:hover {
+    transform: translateY(-2px);
+    border-color: rgba(20,184,166,.32);
+}
+
+.feature-card h3 {
+    margin: 14px 0 10px;
+    color: #f8fafc;
+}
+
+.feature-card p {
+    margin: 0;
+    color: var(--muted);
+    line-height: 1.7;
+}
+
+.feature-icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 14px;
+    display: grid;
+    place-items: center;
+    background: rgba(20,184,166,.12);
+    color: #99f6e4;
+    font-size: 18px;
+}
+
+@media (max-width: 760px) {
+    .feature-grid {
+        grid-template-columns: 1fr;
+    }
+}
