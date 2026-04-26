@@ -974,7 +974,9 @@ tr:hover td {
 }
 
 @media (prefers-reduced-motion: reduce) {
-    *, *::before, *::after {
+    *,
+    *::before,
+    *::after {
         animation: none !important;
         transition: none !important;
         scroll-behavior: auto !important;
@@ -984,7 +986,9 @@ tr:hover td {
         opacity: 1 !important;
         transform: none !important;
     }
-    .table-wrap {
+}
+
+.table-wrap {
     width: 100%;
     overflow-x: auto;
     overflow-y: hidden;
@@ -1050,7 +1054,7 @@ tr:hover td {
         min-width: 860px;
     }
 }
-}
+
 .feature-grid {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -1080,7 +1084,7 @@ tr:hover td {
 
 .feature-card p {
     margin: 0;
-    color: var(--muted);
+    color: var(--text-muted);
     line-height: 1.7;
 }
 
@@ -1098,5 +1102,126 @@ tr:hover td {
 @media (max-width: 760px) {
     .feature-grid {
         grid-template-columns: 1fr;
+    }
+}
+
+/* GLOBAL DARK FORM FIX */
+input,
+select,
+textarea,
+.form-control,
+.form-select {
+    -webkit-appearance: none;
+    appearance: none;
+    background: rgba(255, 255, 255, 0.06) !important;
+    background-color: rgba(255, 255, 255, 0.06) !important;
+    background-image: none !important;
+    color: #f3f7ff !important;
+    border: 1px solid rgba(255, 255, 255, 0.10) !important;
+    box-shadow: none !important;
+}
+
+input:focus,
+select:focus,
+textarea:focus,
+.form-control:focus,
+.form-select:focus,
+input:active,
+select:active,
+textarea:active {
+    background: rgba(255, 255, 255, 0.08) !important;
+    background-color: rgba(255, 255, 255, 0.08) !important;
+    color: #ffffff !important;
+    border: 1px solid rgba(109, 124, 255, 0.72) !important;
+    box-shadow: 0 0 0 4px rgba(109, 124, 255, 0.14) !important;
+    outline: none !important;
+}
+
+input::placeholder,
+textarea::placeholder {
+    color: rgba(219, 230, 255, 0.38) !important;
+}
+
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active,
+textarea:-webkit-autofill,
+textarea:-webkit-autofill:hover,
+textarea:-webkit-autofill:focus,
+select:-webkit-autofill {
+    -webkit-text-fill-color: #ffffff !important;
+    caret-color: #ffffff !important;
+    -webkit-box-shadow: 0 0 0 1000px #24304e inset !important;
+    box-shadow: 0 0 0 1000px #24304e inset !important;
+    transition: background-color 999999s ease-in-out 0s !important;
+    border: 1px solid rgba(255, 255, 255, 0.10) !important;
+}
+
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="tel"],
+select,
+textarea {
+    border-radius: 16px !important;
+    background-clip: padding-box !important;
+}
+
+input[type="checkbox"],
+.form-check-input {
+    width: 18px;
+    height: 18px;
+    border-radius: 6px !important;
+    background-color: rgba(255,255,255,0.08) !important;
+    border: 1px solid rgba(255,255,255,0.18) !important;
+    box-shadow: none !important;
+}
+
+input[type="checkbox"]:checked,
+.form-check-input:checked {
+    background-color: #1bd3d0 !important;
+    border-color: #1bd3d0 !important;
+}
+
+.contact-form input,
+.contact-form select,
+.contact-form textarea,
+.admin-login-form input,
+.admin-login-form select,
+.register-form input,
+.register-form select,
+.login-form input,
+.auth-form input {
+    background: transparent !important;
+    background-color: transparent !important;
+    color: #f3f7ff !important;
+    border: none !important;
+    box-shadow: none !important;
+}
+
+.input-shell,
+.select-shell {
+    background: rgba(255, 255, 255, 0.06) !important;
+    border: 1px solid rgba(255,255,255,0.10) !important;
+    border-radius: 18px !important;
+}
+
+@media (max-width: 768px) {
+    input,
+    select,
+    textarea,
+    .form-control,
+    .form-select {
+        font-size: 16px !important;
+        min-height: 54px;
+        color: #f3f7ff !important;
+        background: rgba(255,255,255,0.06) !important;
+        background-color: rgba(255,255,255,0.06) !important;
+    }
+
+    body,
+    html {
+        background-color: #0e1a2b;
     }
 }
