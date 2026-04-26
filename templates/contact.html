@@ -11,56 +11,71 @@
     <form method="POST">
         <div class="form-grid">
             <div class="form-group">
-                <label class="form-label">Имя</label>
-                <input type="text" name="first_name" required value="{{ user.first_name if user else '' }}">
+                <label class="form-label" for="first_name">Имя</label>
+                <input
+                    type="text"
+                    id="first_name"
+                    name="first_name"
+                    required
+                    value="{{ request.form.get('first_name', user.first_name if user else '') }}"
+                >
             </div>
 
             <div class="form-group">
-                <label class="form-label">Фамилия</label>
-                <input type="text" name="last_name" required value="{{ user.last_name if user else '' }}">
+                <label class="form-label" for="last_name">Фамилия</label>
+                <input
+                    type="text"
+                    id="last_name"
+                    name="last_name"
+                    required
+                    value="{{ request.form.get('last_name', user.last_name if user else '') }}"
+                >
             </div>
         </div>
 
         <div class="form-grid">
             <div class="form-group">
-                <label class="form-label">Телефон</label>
+                <label class="form-label" for="phone">Телефон</label>
                 <input
                     type="tel"
+                    id="phone"
                     name="phone"
                     placeholder="+79991234567"
-                    inputmode="numeric"
-                    pattern="^\+7[0-9]{10}$"
+                    inputmode="tel"
+                    pattern="^\+7\d{10}$"
                     maxlength="12"
                     required
-                    oninput="this.value = this.value.replace(/[^0-9+]/g, ''); if (!this.value.startsWith('+')) { this.value = '+' + this.value.replace(/\+/g, ''); } if (this.value.indexOf('+') > 0) { this.value = '+' + this.value.replace(/\+/g, ''); } this.value = this.value.slice(0, 12);"
+                    value="{{ request.form.get('phone', '') }}"
                 >
             </div>
 
             <div class="form-group">
-                <label class="form-label">Услуга</label>
-                <select name="service" required>
+                <label class="form-label" for="service">Услуга</label>
+                <select name="service" id="service" required>
                     <option value="">Выберите услугу</option>
-                    <option>Изготовление ключа</option>
-                    <option>Программирование чип-ключа</option>
-                    <option>Аварийное вскрытие автомобиля</option>
-                    <option>Ремонт замка зажигания</option>
+                    <option value="Изготовление ключа" {% if request.form.get('service') == 'Изготовление ключа' %}selected{% endif %}>Изготовление ключа</option>
+                    <option value="Программирование чип-ключа" {% if request.form.get('service') == 'Программирование чип-ключа' %}selected{% endif %}>Программирование чип-ключа</option>
+                    <option value="Аварийное вскрытие автомобиля" {% if request.form.get('service') == 'Аварийное вскрытие автомобиля' %}selected{% endif %}>Аварийное вскрытие автомобиля</option>
+                    <option value="Ремонт замка зажигания" {% if request.form.get('service') == 'Ремонт замка зажигания' %}selected{% endif %}>Ремонт замка зажигания</option>
                 </select>
             </div>
         </div>
 
         <div class="form-grid">
             <div class="form-group">
-                <label class="form-label">Марка автомобиля</label>
+                <label class="form-label" for="brand-select">Марка автомобиля</label>
                 <select name="brand" id="brand-select" required>
                     <option value="">Выберите марку</option>
                     {% for brand in car_brands.keys() %}
-                        <option value="{{ brand }}">{{ brand }}</option>
+                        <option value="{{ brand }}" {% if request.form.get('brand') == brand %}selected{% endif %}>
+                            {{ brand }}
+                        </option>
                     {% endfor %}
                 </select>
             </div>
 
             <div class="form-group">
-                <label class="form-label">Модель автомобиля</label>
+                <label class="form-label" for="model-select">Модель автомобиля</label>
                 <select name="car_model" id="model-select" required>
                     <option value="">Сначала выберите марку</option>
                 </select>
@@ -75,20 +90,47 @@
     const carBrands = {{ car_brands | tojson }};
     const brandSelect = document.getElementById('brand-select');
     const modelSelect = document.getElementById('model-select');
+    const selectedBrand = "{{ request.form.get('brand', '') }}";
+    const selectedModel = "{{ request.form.get('car_model', '') }}";
+    const phoneInput = document.getElementById('phone');
 
-    brandSelect.addEventListener('change', function () {
-        const brand = this.value;
+    function fillModels(brand, selected = '') {
         const models = carBrands[brand] || [];
-
         modelSelect.innerHTML = '<option value="">Выберите модель</option>';
 
         models.forEach(model => {
             const option = document.createElement('option');
             option.value = model;
             option.textContent = model;
+            if (model === selected) {
+                option.selected = true;
+            }
             modelSelect.appendChild(option);
         });
+    }
+
+    brandSelect.addEventListener('change', function () {
+        fillModels(this.value);
     });
+
+    phoneInput.addEventListener('input', function () {
+        let value = this.value.replace(/[^\d+]/g, '');
+
+        if (value.startsWith('8')) {
+            value = '+7' + value.slice(1);
+        }
+
+        if (!value.startsWith('+7')) {
+            value = '+7' + value.replace(/[^\d]/g, '').replace(/^7/, '');
+        }
+
+        value = '+7' + value.slice(2).replace(/\D/g, '').slice(0, 10);
+        this.value = value;
+    });
+
+    if (selectedBrand) {
+        fillModels(selectedBrand, selectedModel);
+    }
 </script>
 
 {% endblock %}
