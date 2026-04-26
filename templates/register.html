@@ -1,14 +1,14 @@
 {% extends 'base.html' %}
-{% block title %}Регистрация | Автоключи 33{% endblock %}
-{% block content %}
+{% block title %}Регистрация | AutoKey{% endblock %}
 
+{% block content %}
 <section class="auth-shell">
     <div class="auth-card register-card">
         <div class="register-icon-wrap">
             <div class="register-icon">🔑</div>
         </div>
 
-        <div class="section-head register-head">
+        <div class="register-head">
             <h2>Создать аккаунт</h2>
             <p>Заполните форму для регистрации</p>
         </div>
@@ -17,9 +17,9 @@
             <span>*</span> — обязательные поля
         </div>
 
-        <form method="POST" class="register-form">
+        <form method="POST" class="register-form" autocomplete="on">
             <div class="form-group">
-                <label class="form-label" for="full_name">ФИО <span class="req">*</span></label>
+                <label for="full_name">ФИО <span class="req">*</span></label>
                 <div class="input-shell input-shell-lg">
                     <span class="input-icon">👤</span>
                     <input
@@ -33,9 +33,9 @@
                 </div>
             </div>
 
-            <div class="form-grid register-grid">
+            <div class="form-grid">
                 <div class="form-group">
-                    <label class="form-label" for="email">Email</label>
+                    <label for="email">EMAIL</label>
                     <div class="input-shell">
                         <span class="input-icon">✉️</span>
                         <input
@@ -49,7 +49,7 @@
                 </div>
 
                 <div class="form-group">
-                    <label class="form-label" for="phone">Телефон</label>
+                    <label for="phone">ТЕЛЕФОН</label>
                     <div class="input-shell">
                         <span class="input-icon">📞</span>
                         <input
@@ -64,7 +64,7 @@
             </div>
 
             <div class="form-group">
-                <label class="form-label" for="username">Логин <span class="req">*</span></label>
+                <label for="username">ЛОГИН <span class="req">*</span></label>
                 <div class="input-shell">
                     <span class="input-icon">📌</span>
                     <input
@@ -78,9 +78,9 @@
                 </div>
             </div>
 
-            <div class="form-grid register-grid">
+            <div class="form-grid">
                 <div class="form-group">
-                    <label class="form-label" for="password">Пароль <span class="req">*</span></label>
+                    <label for="password">ПАРОЛЬ <span class="req">*</span></label>
                     <div class="input-shell">
                         <span class="input-icon">🔒</span>
                         <input
@@ -95,7 +95,7 @@
                 </div>
 
                 <div class="form-group">
-                    <label class="form-label" for="password2">Повторите пароль <span class="req">*</span></label>
+                    <label for="password2">ПОВТОРИТЕ ПАРОЛЬ <span class="req">*</span></label>
                     <div class="input-shell">
                         <span class="input-icon">🔐</span>
                         <input
@@ -119,7 +119,7 @@
                 </span>
             </label>
 
-            <button type="submit" class="btn btn-primary register-submit">
+            <button type="submit" class="register-submit">
                 Создать аккаунт →
             </button>
 
@@ -136,210 +136,276 @@
 </section>
 
 <style>
-    .auth-shell {
-        min-height: calc(100vh - 220px);
-        display: flex;
-        align-items: center;
-        justify-content: center;
+.auth-shell{
+    min-height:calc(100vh - 180px);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:40px 16px;
+}
+
+.register-card{
+    width:100%;
+    max-width:620px;
+    padding:34px 34px 28px;
+    border-radius:28px;
+    background:linear-gradient(145deg, rgba(16,26,47,.97), rgba(23,39,71,.96));
+    border:1px solid rgba(255,255,255,.08);
+    box-shadow:
+        0 24px 60px rgba(0,0,0,.35),
+        inset 0 1px 0 rgba(255,255,255,.04);
+}
+
+.register-icon-wrap{
+    display:flex;
+    justify-content:center;
+    margin-bottom:18px;
+}
+
+.register-icon{
+    width:74px;
+    height:74px;
+    border-radius:22px;
+    display:grid;
+    place-items:center;
+    font-size:30px;
+    color:#fff;
+    background:linear-gradient(135deg, #4f7cff, #7a5cff);
+    box-shadow:0 16px 34px rgba(79,124,255,.30);
+}
+
+.register-head{
+    text-align:center;
+    margin-bottom:22px;
+}
+
+.register-head h2{
+    margin:0 0 10px;
+    font-size:clamp(30px, 4vw, 42px);
+    color:#ffffff;
+    font-weight:800;
+}
+
+.register-head p{
+    margin:0;
+    color:rgba(220,231,255,.62);
+}
+
+.register-required-note{
+    margin-bottom:18px;
+    color:rgba(220,231,255,.55);
+    font-size:14px;
+}
+
+.register-required-note span,
+.req{
+    color:#ff7f97;
+    font-weight:700;
+}
+
+.register-form{
+    display:flex;
+    flex-direction:column;
+    gap:16px;
+}
+
+.form-grid{
+    display:grid;
+    grid-template-columns:repeat(2, minmax(0, 1fr));
+    gap:16px;
+}
+
+.form-group label{
+    display:block;
+    margin-bottom:8px;
+    color:#dbe6ff;
+    font-size:13px;
+    font-weight:700;
+    letter-spacing:.04em;
+}
+
+.input-shell{
+    display:flex;
+    align-items:center;
+    min-height:58px;
+    border-radius:18px;
+    background:rgba(255,255,255,.06);
+    border:1px solid rgba(255,255,255,.10);
+    overflow:hidden;
+    transition:.2s ease;
+}
+
+.input-shell:focus-within{
+    border-color:rgba(109,124,255,.72);
+    box-shadow:0 0 0 4px rgba(109,124,255,.14);
+    background:rgba(255,255,255,.08);
+}
+
+.input-shell-lg{
+    border-color:rgba(109,124,255,.55);
+    box-shadow:0 0 0 4px rgba(109,124,255,.10);
+}
+
+.input-icon{
+    width:48px;
+    display:grid;
+    place-items:center;
+    flex-shrink:0;
+    font-size:16px;
+    color:rgba(173,191,255,.9);
+}
+
+.input-shell input{
+    width:100%;
+    height:58px;
+    border:none !important;
+    outline:none !important;
+    background:transparent !important;
+    background-color:transparent !important;
+    box-shadow:none !important;
+    color:#f3f7ff !important;
+    padding:16px 18px 16px 0 !important;
+    -webkit-appearance:none;
+    appearance:none;
+    font-size:16px;
+}
+
+.input-shell input::placeholder{
+    color:rgba(219,230,255,.38) !important;
+}
+
+.input-shell input:focus,
+.input-shell input:active{
+    background:transparent !important;
+    background-color:transparent !important;
+    color:#ffffff !important;
+    box-shadow:none !important;
+    border:none !important;
+    outline:none !important;
+}
+
+.input-shell input:-webkit-autofill,
+.input-shell input:-webkit-autofill:hover,
+.input-shell input:-webkit-autofill:focus,
+.input-shell input:-webkit-autofill:active{
+    -webkit-text-fill-color:#ffffff !important;
+    -webkit-box-shadow:0 0 0 1000px rgba(36,48,78,1) inset !important;
+    box-shadow:0 0 0 1000px rgba(36,48,78,1) inset !important;
+    transition:background-color 9999s ease-in-out 0s;
+    border:none !important;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea,
+.form-control{
+    background:transparent !important;
+    background-color:transparent !important;
+    color:#f3f7ff !important;
+    border:none !important;
+    box-shadow:none !important;
+}
+
+.form-control:focus{
+    background:transparent !important;
+    background-color:transparent !important;
+    color:#ffffff !important;
+    border:none !important;
+    box-shadow:none !important;
+}
+
+.register-policy{
+    display:flex;
+    gap:12px;
+    align-items:flex-start;
+    color:rgba(255,255,255,.76);
+    line-height:1.5;
+    margin-top:4px;
+}
+
+.register-policy input{
+    margin-top:3px;
+    width:18px;
+    height:18px;
+    accent-color:#5ee7df;
+    flex-shrink:0;
+}
+
+.register-policy a{
+    color:#9fc5ff;
+    text-decoration:underline;
+    text-underline-offset:3px;
+}
+
+.register-submit{
+    margin-top:6px;
+    min-height:58px;
+    border:none;
+    border-radius:18px;
+    background:linear-gradient(135deg, #1bd3d0, #7cf0e0);
+    color:#0d1b2f;
+    font-size:18px;
+    font-weight:800;
+    cursor:pointer;
+    transition:.2s ease;
+}
+
+.register-submit:hover{
+    transform:translateY(-1px);
+    box-shadow:0 14px 28px rgba(27,211,208,.22);
+}
+
+.register-divider{
+    display:flex;
+    align-items:center;
+    gap:14px;
+    margin-top:8px;
+    color:rgba(255,255,255,.42);
+}
+
+.register-divider::before,
+.register-divider::after{
+    content:"";
+    flex:1;
+    height:1px;
+    background:rgba(255,255,255,.10);
+}
+
+.register-links{
+    display:grid;
+    grid-template-columns:repeat(2, minmax(0, 1fr));
+    gap:14px;
+}
+
+.register-link{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    min-height:48px;
+    border-radius:16px;
+    background:rgba(255,255,255,.04);
+    border:1px solid rgba(255,255,255,.08);
+    color:#dce6ff;
+    text-decoration:none;
+    font-weight:600;
+    transition:.2s ease;
+}
+
+.register-link:hover{
+    background:rgba(255,255,255,.08);
+    color:#ffffff;
+}
+
+@media (max-width:760px){
+    .register-card{
+        padding:24px 18px 20px;
+        border-radius:22px;
     }
 
-    .register-card {
-        width: 100%;
-        max-width: 620px;
-        margin: 0 auto;
-        padding: 34px 34px 28px;
-        border-radius: 30px;
-        background:
-            linear-gradient(145deg, rgba(19, 31, 56, 0.96), rgba(24, 40, 70, 0.92));
-        border: 1px solid rgba(255,255,255,.10);
-        box-shadow:
-            0 24px 60px rgba(0,0,0,.30),
-            inset 0 1px 0 rgba(255,255,255,.06);
+    .form-grid,
+    .register-links{
+        grid-template-columns:1fr;
     }
-
-    .register-icon-wrap {
-        display: flex;
-        justify-content: center;
-        margin-bottom: 18px;
-    }
-
-    .register-icon {
-        width: 72px;
-        height: 72px;
-        border-radius: 22px;
-        display: grid;
-        place-items: center;
-        font-size: 32px;
-        color: #fff;
-        background: linear-gradient(135deg, #6f7cff, #8f5dff);
-        box-shadow:
-            0 18px 34px rgba(111,124,255,.26),
-            0 0 0 10px rgba(111,124,255,.08);
-    }
-
-    .register-head {
-        text-align: center;
-        margin-bottom: 22px;
-    }
-
-    .register-head h2 {
-        margin-bottom: 10px;
-        font-size: clamp(32px, 4vw, 42px);
-    }
-
-    .register-head p {
-        color: rgba(214, 227, 243, 0.72);
-    }
-
-    .register-required-note {
-        margin-bottom: 18px;
-        color: rgba(214, 227, 243, 0.62);
-        font-size: 14px;
-    }
-
-    .register-required-note span,
-    .req {
-        color: #ff7f91;
-        font-weight: 800;
-    }
-
-    .register-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 16px;
-    }
-
-    .input-shell {
-        position: relative;
-        display: flex;
-        align-items: center;
-        border-radius: 18px;
-        background: rgba(255,255,255,.06);
-        border: 1px solid rgba(255,255,255,.10);
-        transition: var(--transition);
-        overflow: hidden;
-    }
-
-    .input-shell:focus-within {
-        border-color: rgba(111,124,255,.60);
-        box-shadow: 0 0 0 4px rgba(111,124,255,.14);
-        background: rgba(255,255,255,.08);
-    }
-
-    .input-shell-lg {
-        border-color: rgba(111,124,255,.55);
-        box-shadow: 0 0 0 4px rgba(111,124,255,.10);
-    }
-
-    .input-icon {
-        width: 48px;
-        display: grid;
-        place-items: center;
-        flex-shrink: 0;
-        font-size: 16px;
-        opacity: .9;
-    }
-
-    .input-shell input {
-        border: 0;
-        background: transparent;
-        box-shadow: none;
-        padding-left: 0;
-    }
-
-    .input-shell input:focus {
-        border: 0;
-        background: transparent;
-        box-shadow: none;
-    }
-
-    .register-policy {
-        display: flex;
-        align-items: flex-start;
-        gap: 12px;
-        margin: 10px 0 22px;
-        color: var(--text-soft);
-        line-height: 1.6;
-    }
-
-    .register-policy input {
-        width: 18px;
-        height: 18px;
-        margin-top: 2px;
-        accent-color: var(--accent);
-        flex-shrink: 0;
-    }
-
-    .register-policy a {
-        color: #9ab7ff;
-        text-decoration: underline;
-        text-underline-offset: 3px;
-    }
-
-    .register-submit {
-        width: 100%;
-        min-height: 58px;
-        font-size: 18px;
-        margin-top: 4px;
-    }
-
-    .register-divider {
-        display: flex;
-        align-items: center;
-        gap: 14px;
-        margin: 22px 0 18px;
-        color: rgba(214,227,243,.46);
-        text-transform: lowercase;
-    }
-
-    .register-divider::before,
-    .register-divider::after {
-        content: "";
-        flex: 1;
-        height: 1px;
-        background: rgba(255,255,255,.10);
-    }
-
-    .register-links {
-        display: grid;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 14px;
-    }
-
-    .register-link {
-        display: inline-flex;
-        justify-content: center;
-        align-items: center;
-        gap: 8px;
-        min-height: 48px;
-        padding: 12px 16px;
-        border-radius: 16px;
-        background: rgba(255,255,255,.04);
-        border: 1px solid rgba(255,255,255,.08);
-        color: var(--text-soft);
-        font-weight: 600;
-    }
-
-    .register-link:hover {
-        background: rgba(255,255,255,.08);
-        color: #fff;
-    }
-
-    @media (max-width: 760px) {
-        .register-card {
-            padding: 24px 20px 20px;
-            border-radius: 24px;
-        }
-
-        .register-grid,
-        .register-links {
-            grid-template-columns: 1fr;
-        }
-
-        .register-submit {
-            min-height: 54px;
-            font-size: 17px;
-        }
-    }
+}
 </style>
-
 {% endblock %}
