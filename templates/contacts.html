@@ -1,16 +1,140 @@
-{% extends 'base.html' %}
-{% block title %}Контакты | Автоключи 33{% endblock %}
-{% block content %}
-<section class="content-card">
+<section class="content-card contact-page">
     <div class="section-head">
         <h2>Контакты</h2>
-        <p>Свяжитесь с нами удобным способом или оставьте заявку через сайт.</p>
+        <p>Свяжитесь с нами удобным способом или откройте карточку организации в Яндекс Картах.</p>
     </div>
-    <div class="feature-grid">
-        <div class="info-card"><h3>Адрес</h3><p>г. Владимир, ул. Большая Московская, 19А</p></div>
-        <div class="info-card"><h3>График</h3><p>Ежедневно: 10:00 — 20:00<br>Вскрытие авто: 24/7</p></div>
-        <div class="info-card"><h3>Выезд</h3><p>По Владимиру и Владимирской области</p></div>
-        <div class="info-card"><h3>Заявка</h3><p><a href="{{ url_for('contact') }}" class="btn btn-primary">Оставить заявку</a></p></div>
+
+    <div class="contact-layout">
+        <div class="contact-panel">
+            <div class="contact-grid">
+                <div class="info-card">
+                    <h3>Адрес</h3>
+                    <p>г. Владимир, ул. Большая Московская, 19А</p>
+                </div>
+
+                <div class="info-card">
+                    <h3>График</h3>
+                    <p>Ежедневно: 10:00 — 20:00<br>Вскрытие авто: 24/7</p>
+                </div>
+
+                <div class="info-card">
+                    <h3>Выезд</h3>
+                    <p>По Владимиру и Владимирской области</p>
+                </div>
+
+                <div class="info-card">
+                    <h3>Заявка</h3>
+                    <p><a href="{{ url_for('contact') }}" class="btn btn-primary">Оставить заявку</a></p>
+                </div>
+            </div>
+
+            <div class="contact-actions">
+                <a
+                    href="https://yandex.ru/profile/-/CPG9QOmn"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="btn btn-light"
+                >
+                    Открыть карточку Ключ Сервис
+                </a>
+            </div>
+        </div>
+
+        <div class="map-card">
+            <iframe
+                src="https://www.openstreetmap.org/export/embed.html?bbox=40.392994%2C56.118599%2C40.412994%2C56.138599&layer=mapnik&marker=56.128599%2C40.402994"
+                width="100%"
+                height="460"
+                style="border:0;"
+                loading="lazy"
+                title="Карта места работы">
+            </iframe>
+        </div>
     </div>
 </section>
-{% endblock %}
+
+<style>
+    .contact-page {
+        display: grid;
+        gap: 24px;
+    }
+
+    .contact-layout {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
+        gap: 24px;
+        align-items: start;
+    }
+
+    .contact-panel {
+        display: grid;
+        gap: 18px;
+    }
+
+    .contact-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 16px;
+    }
+
+    .contact-grid .info-card {
+        padding: 22px;
+    }
+
+    .contact-grid .info-card h3 {
+        margin-bottom: 10px;
+    }
+
+    .contact-grid .info-card p {
+        color: var(--muted);
+        line-height: 1.7;
+    }
+
+    .contact-actions {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+    }
+
+    .contact-actions .btn {
+        min-width: 280px;
+        justify-content: center;
+    }
+
+    .map-card {
+        border-radius: 24px;
+        overflow: hidden;
+        border: 1px solid var(--line);
+        box-shadow: var(--shadow);
+        background: #111827;
+        min-height: 460px;
+    }
+
+    .map-card iframe {
+        display: block;
+        width: 100%;
+        height: 460px;
+    }
+
+    @media (max-width: 1024px) {
+        .contact-layout {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    @media (max-width: 760px) {
+        .contact-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .contact-actions .btn {
+            width: 100%;
+            min-width: 0;
+        }
+
+        .map-card,
+        .map-card iframe {
+            height: 340px;
+        }
+    }
+</style>
