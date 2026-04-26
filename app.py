@@ -95,10 +95,11 @@ CAR_BRANDS = {
     'Zeekr': ['001', 'X']
 }
 
-
 PHONE_MASK_RE = re.compile(r'^\+7 \(\d{3}\) \d{3}-\d{2}-\d{2}$')
 EMAIL_LATIN_RE = re.compile(r'^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$')
 USERNAME_RE = re.compile(r'^[A-Za-zA-Яа-яЁё0-9_.-]+$')
+VIN_RE = re.compile(r'^[A-HJ-NPR-Z0-9-]{1,17}$')
+REG_NUMBER_RE = re.compile(r'^[АВЕКМНОРСТУХ]\d{3}[АВЕКМНОРСТУХ]{2}\d{2,3}$')
 
 
 class User(db.Model):
@@ -177,6 +178,32 @@ def normalize_email(email_raw):
 def is_latin_email(email):
     email = normalize_email(email)
     return bool(EMAIL_LATIN_RE.fullmatch(email))
+
+
+def normalize_vin(vin_raw):
+    vin = clean_text(vin_raw).upper()
+    vin = re.sub(r'[^A-Z0-9-]', '', vin)
+    vin = vin.replace('I', '').replace('O', '').replace('Q', '')
+    return vin[:17]
+
+
+def normalize_reg_number(reg_raw):
+    reg_number = clean_text(reg_raw).upper()
+    latin_to_cyr = str.maketrans({
+        'A': 'А', 'B': 'В', 'E': 'Е', 'K': 'К', 'M': 'М',
+        'H': 'Н', 'O': 'О', 'P': 'Р', 'C': 'С', 'T': 'Т',
+        'Y': 'У', 'X': 'Х'
+    })
+    reg_number = reg_number.translate(latin_to_cyr)
+    reg_number = re.sub(r'[^АВЕКМНОРСТУХ0-9]', '', reg_number)
+    return reg_number[:9]
+
+
+def get_sorted_car_brands():
+    return {
+        brand: sorted(models, key=lambda x: x.lower())
+        for brand, models in sorted(CAR_BRANDS.items(), key=lambda item: item[0].lower())
+    }
 
 
 def send_email(to_email, subject, html_message):
@@ -523,6 +550,8 @@ def contact():
     if session.get('user_id'):
         current_user = User.query.get(session['user_id'])
 
+    sorted_car_brands = get_sorted_car_brands()
+
     if request.method == 'POST':
         name = clean_text(request.form.get('name'))
         phone_raw = clean_text(request.form.get('phone'))
@@ -532,40 +561,52 @@ def contact():
         model = clean_text(request.form.get('model'))
         year = clean_text(request.form.get('year'))
         service = clean_text(request.form.get('service'))
-        vin = clean_text(request.form.get('vin'))
-        reg_number = clean_text(request.form.get('reg_number'))
+        vin = normalize_vin(request.form.get('vin'))
+        reg_number = normalize_reg_number(request.form.get('reg_number'))
         message = clean_text(request.form.get('message'))
         policy = request.form.get('policy')
 
         if not name:
             flash('Введите имя.')
-            return render_template('contact.html', user=current_user, car_brands=CAR_BRANDS)
+            return render_template('contact.html', user=current_user, car_brands=sorted_car_brands)
 
         phone = normalize_phone(phone_raw)
         if not phone:
             flash('Введите телефон в формате +7 (999) 999-99-99.')
-            return render_template('contact.html', user=current_user, car_brands=CAR_BRANDS)
+            return render_template('contact.html', user=current_user, car_brands=sorted_car_brands)
 
         if email and not is_latin_email(email):
             flash('Email должен содержать только латиницу и корректный формат.')
-            return render_template('contact.html', user=current_user, car_brands=CAR_BRANDS)
+            return render_template('contact.html', user=current_user, car_brands=sorted_car_brands)
 
-        if not brand or brand not in CAR_BRANDS:
+        if not brand or brand not in sorted_car_brands:
             flash('Выберите марку автомобиля.')
-            return render_template('contact.html', user=current_user, car_brands=CAR_BRANDS)
+            return render_template('contact.html', user=current_user, car_brands=sorted_car_brands)
 
-        valid_models = CAR_BRANDS.get(brand, [])
+        valid_models = sorted_car_brands.get(brand, [])
         if not model or model not in valid_models:
             flash('Выберите модель автомобиля только из списка.')
-            return render_template('contact.html', user=current_user, car_brands=CAR_BRANDS)
+            return render_template('contact.html', user=current_user, car_brands=sorted_car_brands)
+
+        if year and not re.fullmatch(r'\d{4}', year):
+            flash('Год выпуска должен содержать 4 цифры.')
+            return render_template('contact.html', user=current_user, car_brands=sorted_car_brands)
+
+        if vin and not VIN_RE.fullmatch(vin):
+            flash('VIN: только латинские буквы, цифры и дефис, без I, O, Q.')
+            return render_template('contact.html', user=current_user, car_brands=sorted_car_brands)
+
+        if reg_number and not REG_NUMBER_RE.fullmatch(reg_number):
+            flash('Госномер должен быть в формате Х940КТ777.')
+            return render_template('contact.html', user=current_user, car_brands=sorted_car_brands)
 
         if not service:
             flash('Выберите услугу.')
-            return render_template('contact.html', user=current_user, car_brands=CAR_BRANDS)
+            return render_template('contact.html', user=current_user, car_brands=sorted_car_brands)
 
         if not policy:
             flash('Необходимо согласие с политикой конфиденциальности.')
-            return render_template('contact.html', user=current_user, car_brands=CAR_BRANDS)
+            return render_template('contact.html', user=current_user, car_brands=sorted_car_brands)
 
         order = Order(
             name=name,
@@ -601,7 +642,7 @@ def contact():
         flash('Заявка успешно отправлена.')
         return redirect(url_for('contact'))
 
-    return render_template('contact.html', user=current_user, car_brands=CAR_BRANDS)
+    return render_template('contact.html', user=current_user, car_brands=sorted_car_brands)
 
 
 @app.route('/reviews', methods=['GET', 'POST'])
