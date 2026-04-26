@@ -1,53 +1,345 @@
 {% extends 'base.html' %}
-{% block title %}Регистрация{% endblock %}
+{% block title %}Регистрация | Автоключи 33{% endblock %}
 {% block content %}
 
-<div class="auth-card" style="max-width:700px; margin:0 auto;">
-    <div class="section-head">
-        <h2>Регистрация</h2>
-        <p>Создайте аккаунт, чтобы оформлять заявки и следить за их статусом в личном кабинете.</p>
-    </div>
-
-    <form method="POST">
-        <div class="form-grid">
-            <div class="form-group">
-                <label class="form-label">Имя</label>
-                <input type="text" name="first_name" required>
-            </div>
-
-            <div class="form-group">
-                <label class="form-label">Фамилия</label>
-                <input type="text" name="last_name" required>
-            </div>
+<section class="auth-shell">
+    <div class="auth-card register-card">
+        <div class="register-icon-wrap">
+            <div class="register-icon">🔑</div>
         </div>
 
-        <div class="form-grid">
+        <div class="section-head register-head">
+            <h2>Создать аккаунт</h2>
+            <p>Заполните форму для регистрации</p>
+        </div>
+
+        <div class="register-required-note">
+            <span>*</span> — обязательные поля
+        </div>
+
+        <form method="POST" class="register-form">
             <div class="form-group">
-                <label class="form-label">Email</label>
-                <input type="email" name="email" required>
+                <label class="form-label" for="full_name">ФИО <span class="req">*</span></label>
+                <div class="input-shell input-shell-lg">
+                    <span class="input-icon">👤</span>
+                    <input
+                        type="text"
+                        id="full_name"
+                        name="full_name"
+                        placeholder="Иванов Иван Иванович"
+                        value="{{ request.form.get('full_name', '') }}"
+                        required
+                    >
+                </div>
+            </div>
+
+            <div class="form-grid register-grid">
+                <div class="form-group">
+                    <label class="form-label" for="email">Email</label>
+                    <div class="input-shell">
+                        <span class="input-icon">✉️</span>
+                        <input
+                            type="email"
+                            id="email"
+                            name="email"
+                            placeholder="mail@example.com"
+                            value="{{ request.form.get('email', '') }}"
+                        >
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="phone">Телефон</label>
+                    <div class="input-shell">
+                        <span class="input-icon">📞</span>
+                        <input
+                            type="tel"
+                            id="phone"
+                            name="phone"
+                            placeholder="+7 (999) 000-00-00"
+                            value="{{ request.form.get('phone', '') }}"
+                        >
+                    </div>
+                </div>
             </div>
 
             <div class="form-group">
-                <label class="form-label">Логин</label>
-                <input type="text" name="username" required>
+                <label class="form-label" for="username">Логин <span class="req">*</span></label>
+                <div class="input-shell">
+                    <span class="input-icon">📌</span>
+                    <input
+                        type="text"
+                        id="username"
+                        name="username"
+                        placeholder="Придумайте логин"
+                        value="{{ request.form.get('username', '') }}"
+                        required
+                    >
+                </div>
             </div>
-        </div>
 
-        <div class="form-group">
-            <label class="form-label">Пароль</label>
-            <input type="password" name="password" required>
-        </div>
+            <div class="form-grid register-grid">
+                <div class="form-group">
+                    <label class="form-label" for="password">Пароль <span class="req">*</span></label>
+                    <div class="input-shell">
+                        <span class="input-icon">🔒</span>
+                        <input
+                            type="password"
+                            id="password"
+                            name="password"
+                            placeholder="Мин. 6 символов"
+                            required
+                            minlength="6"
+                        >
+                    </div>
+                </div>
 
-        <div class="form-group" style="display:flex; gap:10px; align-items:flex-start;">
-            <input type="checkbox" name="consent" id="consent" required style="width:auto; margin-top:4px;">
-            <label for="consent" style="line-height:1.6;">
-                Я соглашаюсь на обработку персональных данных и принимаю
-                <a href="{{ url_for('privacy') }}" target="_blank">политику конфиденциальности</a>.
+                <div class="form-group">
+                    <label class="form-label" for="password2">Повторите пароль <span class="req">*</span></label>
+                    <div class="input-shell">
+                        <span class="input-icon">🔐</span>
+                        <input
+                            type="password"
+                            id="password2"
+                            name="password2"
+                            placeholder="Повторите пароль"
+                            required
+                            minlength="6"
+                        >
+                    </div>
+                </div>
+            </div>
+
+            <label class="register-policy">
+                <input type="checkbox" name="policy" required>
+                <span>
+                    Я согласен с
+                    <a href="{{ url_for('privacy') }}">Политикой конфиденциальности</a>
+                    и даю согласие на обработку персональных данных.
+                </span>
             </label>
-        </div>
 
-        <button type="submit" class="btn btn-primary">Зарегистрироваться</button>
-    </form>
-</div>
+            <button type="submit" class="btn btn-primary register-submit">
+                Создать аккаунт →
+            </button>
+
+            <div class="register-divider">
+                <span>или</span>
+            </div>
+
+            <div class="register-links">
+                <a href="{{ url_for('index') }}" class="register-link">🏠 На главную</a>
+                <a href="{{ url_for('login') }}" class="register-link">🔑 Уже есть аккаунт</a>
+            </div>
+        </form>
+    </div>
+</section>
+
+<style>
+    .auth-shell {
+        min-height: calc(100vh - 220px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .register-card {
+        width: 100%;
+        max-width: 620px;
+        margin: 0 auto;
+        padding: 34px 34px 28px;
+        border-radius: 30px;
+        background:
+            linear-gradient(145deg, rgba(19, 31, 56, 0.96), rgba(24, 40, 70, 0.92));
+        border: 1px solid rgba(255,255,255,.10);
+        box-shadow:
+            0 24px 60px rgba(0,0,0,.30),
+            inset 0 1px 0 rgba(255,255,255,.06);
+    }
+
+    .register-icon-wrap {
+        display: flex;
+        justify-content: center;
+        margin-bottom: 18px;
+    }
+
+    .register-icon {
+        width: 72px;
+        height: 72px;
+        border-radius: 22px;
+        display: grid;
+        place-items: center;
+        font-size: 32px;
+        color: #fff;
+        background: linear-gradient(135deg, #6f7cff, #8f5dff);
+        box-shadow:
+            0 18px 34px rgba(111,124,255,.26),
+            0 0 0 10px rgba(111,124,255,.08);
+    }
+
+    .register-head {
+        text-align: center;
+        margin-bottom: 22px;
+    }
+
+    .register-head h2 {
+        margin-bottom: 10px;
+        font-size: clamp(32px, 4vw, 42px);
+    }
+
+    .register-head p {
+        color: rgba(214, 227, 243, 0.72);
+    }
+
+    .register-required-note {
+        margin-bottom: 18px;
+        color: rgba(214, 227, 243, 0.62);
+        font-size: 14px;
+    }
+
+    .register-required-note span,
+    .req {
+        color: #ff7f91;
+        font-weight: 800;
+    }
+
+    .register-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 16px;
+    }
+
+    .input-shell {
+        position: relative;
+        display: flex;
+        align-items: center;
+        border-radius: 18px;
+        background: rgba(255,255,255,.06);
+        border: 1px solid rgba(255,255,255,.10);
+        transition: var(--transition);
+        overflow: hidden;
+    }
+
+    .input-shell:focus-within {
+        border-color: rgba(111,124,255,.60);
+        box-shadow: 0 0 0 4px rgba(111,124,255,.14);
+        background: rgba(255,255,255,.08);
+    }
+
+    .input-shell-lg {
+        border-color: rgba(111,124,255,.55);
+        box-shadow: 0 0 0 4px rgba(111,124,255,.10);
+    }
+
+    .input-icon {
+        width: 48px;
+        display: grid;
+        place-items: center;
+        flex-shrink: 0;
+        font-size: 16px;
+        opacity: .9;
+    }
+
+    .input-shell input {
+        border: 0;
+        background: transparent;
+        box-shadow: none;
+        padding-left: 0;
+    }
+
+    .input-shell input:focus {
+        border: 0;
+        background: transparent;
+        box-shadow: none;
+    }
+
+    .register-policy {
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+        margin: 10px 0 22px;
+        color: var(--text-soft);
+        line-height: 1.6;
+    }
+
+    .register-policy input {
+        width: 18px;
+        height: 18px;
+        margin-top: 2px;
+        accent-color: var(--accent);
+        flex-shrink: 0;
+    }
+
+    .register-policy a {
+        color: #9ab7ff;
+        text-decoration: underline;
+        text-underline-offset: 3px;
+    }
+
+    .register-submit {
+        width: 100%;
+        min-height: 58px;
+        font-size: 18px;
+        margin-top: 4px;
+    }
+
+    .register-divider {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        margin: 22px 0 18px;
+        color: rgba(214,227,243,.46);
+        text-transform: lowercase;
+    }
+
+    .register-divider::before,
+    .register-divider::after {
+        content: "";
+        flex: 1;
+        height: 1px;
+        background: rgba(255,255,255,.10);
+    }
+
+    .register-links {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 14px;
+    }
+
+    .register-link {
+        display: inline-flex;
+        justify-content: center;
+        align-items: center;
+        gap: 8px;
+        min-height: 48px;
+        padding: 12px 16px;
+        border-radius: 16px;
+        background: rgba(255,255,255,.04);
+        border: 1px solid rgba(255,255,255,.08);
+        color: var(--text-soft);
+        font-weight: 600;
+    }
+
+    .register-link:hover {
+        background: rgba(255,255,255,.08);
+        color: #fff;
+    }
+
+    @media (max-width: 760px) {
+        .register-card {
+            padding: 24px 20px 20px;
+            border-radius: 24px;
+        }
+
+        .register-grid,
+        .register-links {
+            grid-template-columns: 1fr;
+        }
+
+        .register-submit {
+            min-height: 54px;
+            font-size: 17px;
+        }
+    }
+</style>
 
 {% endblock %}

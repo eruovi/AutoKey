@@ -10,6 +10,7 @@ import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 
+
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 TEMPLATES_DIR = os.path.join(BASE_DIR, 'templates')
 STATIC_DIR = os.path.join(BASE_DIR, 'static')
@@ -22,7 +23,6 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {'pool_pre_ping': True}
 
 db = SQLAlchemy(app)
-
 serializer = URLSafeTimedSerializer(app.secret_key)
 
 PRICES = [
@@ -95,6 +95,7 @@ CAR_BRANDS = {
     'Zeekr': ['001', 'X']
 }
 
+
 class User(db.Model):
     __tablename__ = 'users'
 
@@ -105,10 +106,12 @@ class User(db.Model):
     first_name = db.Column(db.String(100), nullable=True)
     last_name = db.Column(db.String(100), nullable=True)
     email = db.Column(db.String(150), unique=True, nullable=True)
+    phone = db.Column(db.String(20), unique=True, nullable=True)
     consent_accepted = db.Column(db.Boolean, default=False)
     consent_at = db.Column(db.DateTime, nullable=True)
 
     orders = db.relationship('Order', backref='user', lazy=True)
+
 
 class Order(db.Model):
     __tablename__ = 'orders'
@@ -122,6 +125,7 @@ class Order(db.Model):
     created_at = db.Column(db.DateTime, default=db.func.now())
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)
 
+
 class Review(db.Model):
     __tablename__ = 'reviews'
 
@@ -131,6 +135,7 @@ class Review(db.Model):
     rating = db.Column(db.Integer, nullable=False, default=5)
     is_published = db.Column(db.Boolean, default=True)
     created_at = db.Column(db.DateTime, default=db.func.now())
+
 
 def send_email(to_email, subject, html_message):
     smtp_host = os.getenv('MAIL_SERVER')
@@ -161,8 +166,10 @@ def send_email(to_email, subject, html_message):
         print('Ошибка отправки email:', e)
         return False
 
+
 def generate_reset_token(email):
     return serializer.dumps(email, salt='password-reset-salt')
+
 
 def verify_reset_token(token, max_age=3600):
     try:
@@ -171,6 +178,7 @@ def verify_reset_token(token, max_age=3600):
     except (SignatureExpired, BadSignature):
         return None
 
+
 def login_required(f):
     @wraps(f)
     def decorated(*args, **kwargs):
@@ -178,6 +186,7 @@ def login_required(f):
             return redirect(url_for('login'))
         return f(*args, **kwargs)
     return decorated
+
 
 def admin_required(f):
     @wraps(f)
@@ -188,6 +197,7 @@ def admin_required(f):
         return f(*args, **kwargs)
     return decorated
 
+
 def manager_required(f):
     @wraps(f)
     def decorated(*args, **kwargs):
@@ -197,61 +207,108 @@ def manager_required(f):
         return f(*args, **kwargs)
     return decorated
 
+
 @app.route('/')
 def index():
     reviews = Review.query.filter_by(is_published=True).order_by(Review.id.desc()).limit(6).all()
     return render_template('index.html', reviews=reviews)
 
+
 @app.route('/services')
 def services():
     return render_template('services.html')
+
 
 @app.route('/prices')
 def prices():
     return render_template('prices.html', prices=PRICES)
 
+
 @app.route('/gallery')
 def gallery():
     return render_template('gallery.html')
+
 
 @app.route('/contacts')
 def contacts():
     return render_template('contacts.html')
 
+
 @app.route('/privacy')
 def privacy():
     return render_template('privacy.html')
 
+
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
-        first_name = request.form['first_name'].strip()
-        last_name = request.form['last_name'].strip()
-        email = request.form['email'].strip().lower()
-        username = request.form['username'].strip()
-        password = request.form['password'].strip()
-        consent = request.form.get('consent')
+        full_name = request.form.get('full_name', '').strip()
+        email = request.form.get('email', '').strip().lower()
+        phone = request.form.get('phone', '').strip()
+        username = request.form.get('username', '').strip()
+        password = request.form.get('password', '').strip()
+        confirm_password = request.form.get('password2', '').strip()
+        consent = request.form.get('policy')
+
+        if not full_name:
+            flash('Введите ФИО.')
+            return render_template('register.html')
+
+        parts = full_name.split(maxsplit=1)
+        first_name = parts[0]
+        last_name = parts[1] if len(parts) > 1 else ''
+
+        if not username or len(username) < 3:
+            flash('Логин должен быть не короче 3 символов.')
+            return render_template('register.html')
+
+        if not re.fullmatch(r'[A-Za-zA-Яа-яЁё0-9_.-]+', username):
+            flash('Логин содержит недопустимые символы.')
+            return render_template('register.html')
+
+        if email and not re.fullmatch(r'[^@]+@[^@]+\.[^@]+', email):
+            flash('Введите корректный email.')
+            return render_template('register.html')
+
+        if phone:
+            clean_phone = re.sub(r'\D', '', phone)
+            if clean_phone.startswith('8'):
+                clean_phone = '7' + clean_phone[1:]
+            if clean_phone.startswith('7') and len(clean_phone) == 11:
+                phone = '+' + clean_phone
+            if not re.fullmatch(r'\+7[0-9]{10}', phone):
+                flash('Введите телефон в формате +79991234567.')
+                return render_template('register.html')
+
+        if len(password) < 6:
+            flash('Пароль должен быть не короче 6 символов.')
+            return render_template('register.html')
+
+        if password != confirm_password:
+            flash('Пароли не совпадают.')
+            return render_template('register.html')
 
         if not consent:
             flash('Нужно подтвердить согласие на обработку персональных данных.')
-            return render_template('register.html')
-
-        if not re.fullmatch(r'[^@]+@[^@]+\.[^@]+', email):
-            flash('Введите корректный email.')
             return render_template('register.html')
 
         if User.query.filter_by(username=username).first():
             flash('Пользователь с таким логином уже существует.')
             return render_template('register.html')
 
-        if User.query.filter_by(email=email).first():
+        if email and User.query.filter_by(email=email).first():
             flash('Пользователь с таким email уже существует.')
+            return render_template('register.html')
+
+        if phone and User.query.filter_by(phone=phone).first():
+            flash('Пользователь с таким телефоном уже существует.')
             return render_template('register.html')
 
         user = User(
             first_name=first_name,
             last_name=last_name,
-            email=email,
+            email=email if email else None,
+            phone=phone if phone else None,
             username=username,
             password=generate_password_hash(password),
             role='client',
@@ -261,21 +318,24 @@ def register():
         db.session.add(user)
         db.session.commit()
 
-        send_email(
-            email,
-            'Регистрация в AutoKey',
-            f'''
-            <h2>Здравствуйте, {first_name} {last_name}!</h2>
-            <p>Вы успешно зарегистрировались на сайте AutoKey.</p>
-            <p>Ваш логин: <b>{username}</b></p>
-            <p>Теперь вы можете входить в личный кабинет и отслеживать заявки.</p>
-            '''
-        )
+        if email:
+            send_email(
+                email,
+                'Регистрация в AutoKey',
+                f'''
+                <h2>Здравствуйте, {first_name} {last_name}!</h2>
+                <p>Вы успешно зарегистрировались на сайте AutoKey.</p>
+                <p><b>Логин:</b> {username}</p>
+                <p><b>Телефон:</b> {phone if phone else 'не указан'}</p>
+                <p>Теперь вы можете входить в личный кабинет и отслеживать заявки.</p>
+                '''
+            )
 
         flash('Регистрация прошла успешно. Теперь войдите в аккаунт.')
         return redirect(url_for('login'))
 
     return render_template('register.html')
+
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -291,6 +351,7 @@ def login():
             session['first_name'] = user.first_name or ''
             session['last_name'] = user.last_name or ''
             session['email'] = user.email or ''
+            session['phone'] = user.phone or ''
 
             if user.role == 'admin':
                 return redirect(url_for('admin_dashboard'))
@@ -302,6 +363,7 @@ def login():
         flash('Неверный логин или пароль.')
 
     return render_template('login.html')
+
 
 @app.route('/forgot-password', methods=['GET', 'POST'])
 def forgot_password():
@@ -329,6 +391,7 @@ def forgot_password():
         return redirect(url_for('login'))
 
     return render_template('forgot_password.html')
+
 
 @app.route('/reset-password/<token>', methods=['GET', 'POST'])
 def reset_password(token):
@@ -363,6 +426,7 @@ def reset_password(token):
 
     return render_template('reset_password.html', token=token)
 
+
 @app.route('/admin/login', methods=['GET', 'POST'])
 def admin_login():
     if request.method == 'POST':
@@ -381,6 +445,7 @@ def admin_login():
             session['first_name'] = user.first_name or ''
             session['last_name'] = user.last_name or ''
             session['email'] = user.email or ''
+            session['phone'] = user.phone or ''
 
             if user.role == 'manager':
                 return redirect(url_for('admin_orders'))
@@ -391,11 +456,13 @@ def admin_login():
 
     return render_template('admin_login.html')
 
+
 @app.route('/logout')
 def logout():
     session.clear()
     flash('Вы вышли из аккаунта.')
     return redirect(url_for('index'))
+
 
 @app.route('/admin/logout')
 def admin_logout():
@@ -403,11 +470,13 @@ def admin_logout():
     flash('Вы вышли из панели персонала.')
     return redirect(url_for('admin_login'))
 
+
 @app.route('/my-orders')
 @login_required
 def my_orders():
     orders = Order.query.filter_by(user_id=session['user_id']).order_by(Order.id.desc()).all()
     return render_template('myorders.html', orders=orders)
+
 
 @app.route('/contact', methods=['GET', 'POST'])
 def contact():
@@ -462,6 +531,7 @@ def contact():
 
     return render_template('contact.html', user=current_user, car_brands=CAR_BRANDS)
 
+
 @app.route('/reviews', methods=['GET', 'POST'])
 def reviews():
     if request.method == 'POST':
@@ -483,6 +553,7 @@ def reviews():
     reviews_list = Review.query.filter_by(is_published=True).order_by(Review.id.desc()).all()
     return render_template('reviews.html', reviews=reviews_list)
 
+
 @app.route('/admin')
 @manager_required
 def admin_dashboard():
@@ -501,11 +572,13 @@ def admin_dashboard():
         reviews_count=reviews_count
     )
 
+
 @app.route('/admin/orders')
 @manager_required
 def admin_orders():
     orders = Order.query.order_by(Order.id.desc()).all()
     return render_template('admin/orders.html', orders=orders)
+
 
 @app.route('/admin/order/<int:id>/status', methods=['POST'])
 @manager_required
@@ -533,6 +606,7 @@ def admin_order_status(id):
     flash('Статус заявки обновлён.')
     return redirect(url_for('admin_orders'))
 
+
 @app.route('/admin/order/<int:id>/delete', methods=['POST'])
 @admin_required
 def admin_order_delete(id):
@@ -541,6 +615,7 @@ def admin_order_delete(id):
     db.session.commit()
     flash('Заявка удалена.')
     return redirect(url_for('admin_orders'))
+
 
 @app.route('/admin/prices', methods=['GET', 'POST'])
 @manager_required
@@ -563,11 +638,13 @@ def admin_prices():
 
     return render_template('admin/prices.html', prices=PRICES)
 
+
 @app.route('/admin/reviews')
 @manager_required
 def admin_reviews():
     reviews_list = Review.query.order_by(Review.id.desc()).all()
     return render_template('admin/reviews.html', reviews=reviews_list)
+
 
 @app.route('/admin/review/<int:id>/toggle', methods=['POST'])
 @manager_required
@@ -576,6 +653,7 @@ def admin_review_toggle(id):
     review.is_published = not review.is_published
     db.session.commit()
     return redirect(url_for('admin_reviews'))
+
 
 @app.route('/admin/review/<int:id>/delete', methods=['POST'])
 @admin_required
@@ -586,11 +664,13 @@ def admin_review_delete(id):
     flash('Отзыв удалён.')
     return redirect(url_for('admin_reviews'))
 
+
 @app.route('/admin/users')
 @admin_required
 def admin_users():
     users = User.query.all()
     return render_template('admin/users.html', users=users)
+
 
 @app.route('/admin/user/<int:id>/role', methods=['POST'])
 @admin_required
@@ -600,6 +680,7 @@ def admin_user_role(id):
     db.session.commit()
     flash('Роль пользователя обновлена.')
     return redirect(url_for('admin_users'))
+
 
 def add_missing_columns():
     with db.engine.connect() as conn:
@@ -611,11 +692,14 @@ def add_missing_columns():
             conn.execute(text("ALTER TABLE users ADD COLUMN last_name VARCHAR(100)"))
         if 'email' not in columns:
             conn.execute(text("ALTER TABLE users ADD COLUMN email VARCHAR(150)"))
+        if 'phone' not in columns:
+            conn.execute(text("ALTER TABLE users ADD COLUMN phone VARCHAR(20)"))
         if 'consent_accepted' not in columns:
             conn.execute(text("ALTER TABLE users ADD COLUMN consent_accepted BOOLEAN DEFAULT 0"))
         if 'consent_at' not in columns:
             conn.execute(text("ALTER TABLE users ADD COLUMN consent_at DATETIME"))
         conn.commit()
+
 
 with app.app_context():
     db.create_all()
@@ -629,6 +713,7 @@ with app.app_context():
             first_name='Главный',
             last_name='Администратор',
             email='admin@example.com',
+            phone='+79990000001',
             consent_accepted=True
         )
         db.session.add(admin_user)
@@ -642,10 +727,12 @@ with app.app_context():
             first_name='Менеджер',
             last_name='AutoKey',
             email='manager@example.com',
+            phone='+79990000002',
             consent_accepted=True
         )
         db.session.add(manager_user)
         db.session.commit()
+
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=80)
