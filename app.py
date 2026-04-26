@@ -11,19 +11,24 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 
 
+
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 TEMPLATES_DIR = os.path.join(BASE_DIR, 'templates')
 STATIC_DIR = os.path.join(BASE_DIR, 'static')
 
+
 app = Flask(__name__, template_folder=TEMPLATES_DIR, static_folder=STATIC_DIR)
 app.secret_key = os.getenv('SECRET_KEY', 'autokey-secret2026')
+
 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(BASE_DIR, 'orders.db')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {'pool_pre_ping': True}
 
+
 db = SQLAlchemy(app)
 serializer = URLSafeTimedSerializer(app.secret_key)
+
 
 PRICES = [
     {'service': 'Изготовление ключа', 'price': 'от 500 руб.', 'time': '30 мин'},
@@ -31,6 +36,7 @@ PRICES = [
     {'service': 'Аварийное вскрытие автомобиля', 'price': 'от 1500 руб.', 'time': '1-2 часа'},
     {'service': 'Ремонт замка зажигания', 'price': 'от 2000 руб.', 'time': '1 час'},
 ]
+
 
 CAR_BRANDS = {
     'Acura': ['CL', 'CSX', 'ILX', 'Integra', 'MDX', 'NSX', 'RDX', 'RL', 'RLX', 'RSX', 'TL', 'TLX', 'TSX', 'ZDX'],
@@ -95,16 +101,16 @@ CAR_BRANDS = {
     'Zeekr': ['001', 'X']
 }
 
+
 PHONE_MASK_RE = re.compile(r'^\+7 \(\d{3}\) \d{3}-\d{2}-\d{2}$')
 EMAIL_LATIN_RE = re.compile(r'^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$')
 USERNAME_RE = re.compile(r'^[A-Za-zA-Яа-яЁё0-9_.-]+$')
 VIN_RE = re.compile(r'^[A-HJ-NPR-Z0-9-]{1,17}$')
-REG_NUMBER_RE = re.compile(r'^[АВЕКМНОРСТУХ]\d{3}[АВЕКМНОРСТУХ]{2}\d{2,3}$')
+REG_NUMBER_RE = re.compile(r'^[АВЕКМНОРСТУХ]\d{3}[АВЕКМНОРСТУХ]{2}\d{0,3}$')
 
 
 class User(db.Model):
     __tablename__ = 'users'
-
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(100), unique=True, nullable=False)
     password = db.Column(db.String(255), nullable=False)
@@ -115,13 +121,11 @@ class User(db.Model):
     phone = db.Column(db.String(20), unique=True, nullable=True)
     consent_accepted = db.Column(db.Boolean, default=False)
     consent_at = db.Column(db.DateTime, nullable=True)
-
     orders = db.relationship('Order', backref='user', lazy=True)
 
 
 class Order(db.Model):
     __tablename__ = 'orders'
-
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
     phone = db.Column(db.String(20), nullable=False)
@@ -130,7 +134,6 @@ class Order(db.Model):
     status = db.Column(db.String(50), default='новая')
     created_at = db.Column(db.DateTime, default=db.func.now())
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)
-
     email = db.Column(db.String(150), nullable=True)
     city = db.Column(db.String(100), nullable=True)
     year = db.Column(db.String(20), nullable=True)
@@ -141,7 +144,6 @@ class Order(db.Model):
 
 class Review(db.Model):
     __tablename__ = 'reviews'
-
     id = db.Column(db.Integer, primary_key=True)
     author = db.Column(db.String(100), nullable=False)
     text = db.Column(db.Text, nullable=False)
@@ -157,16 +159,12 @@ def clean_text(value):
 def normalize_phone(phone_raw):
     phone_raw = clean_text(phone_raw)
     digits = re.sub(r'\D', '', phone_raw)
-
     if digits.startswith('8'):
         digits = '7' + digits[1:]
-
     if len(digits) == 10:
         digits = '7' + digits
-
     if len(digits) != 11 or not digits.startswith('7'):
         return None
-
     return f'+7 ({digits[1:4]}) {digits[4:7]}-{digits[7:9]}-{digits[9:11]}'
 
 

@@ -109,6 +109,9 @@
                             placeholder="Например: 2014"
                             value="{{ request.form.get('year', '') }}"
                             inputmode="numeric"
+                            maxlength="4"
+                            pattern="\d{4}"
+                            title="Только 4 цифры, например 2014"
                         >
                     </div>
                 </div>
@@ -158,7 +161,8 @@
                             placeholder="Например: Х940КТ777"
                             value="{{ request.form.get('reg_number', '') }}"
                             maxlength="9"
-                            title="Формат: Х940КТ777"
+                            pattern="[АВЕКМНОРСТУХ]\d{3}[АВЕКМНОРСТУХ]{2}\d{0,3}"
+                            title="Формат: буква, 3 цифры, 2 буквы и до 3 цифр"
                         >
                     </div>
                 </div>
@@ -308,7 +312,6 @@ if (selectedBrand) {
 
 function maskPhone(value) {
     let digits = value.replace(/\D/g, "");
-
     if (digits.startsWith("8")) digits = "7" + digits.slice(1);
     if (!digits.startsWith("7")) digits = "7" + digits.replace(/^7*/, "");
     digits = digits.slice(0, 11);
@@ -318,7 +321,6 @@ function maskPhone(value) {
     if (digits.length >= 4) result += ") " + digits.slice(4, 7);
     if (digits.length >= 7) result += "-" + digits.slice(7, 9);
     if (digits.length >= 9) result += "-" + digits.slice(9, 11);
-
     return result;
 }
 
@@ -386,10 +388,18 @@ document.querySelector('.contact-form').addEventListener('submit', function (e) 
         return;
     }
 
-    if (regValue && !/^[АВЕКМНОРСТУХ]\d{3}[АВЕКМНОРСТУХ]{2}\d{2,3}$/.test(regValue)) {
+    if (regValue && !/^[АВЕКМНОРСТУХ]\d{3}[АВЕКМНОРСТУХ]{2}\d{0,3}$/.test(regValue)) {
         e.preventDefault();
         regNumberInput.focus();
-        alert('Госномер должен быть в формате Х940КТ777');
+        alert('Госномер должен быть в формате: буква, 3 цифры, 2 буквы и до 3 цифр');
+        return;
+    }
+
+    const year = document.getElementById('year').value.trim();
+    if (year && !/^\d{4}$/.test(year)) {
+        e.preventDefault();
+        document.getElementById('year').focus();
+        alert('Год выпуска должен содержать ровно 4 цифры');
     }
 });
 </script>
