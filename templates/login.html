@@ -1,29 +1,314 @@
 {% extends 'base.html' %}
-{% block title %}Вход{% endblock %}
+{% block title %}Вход | AutoKey{% endblock %}
+
 {% block content %}
+<section class="auth-shell">
+    <div class="auth-card login-card">
+        <div class="login-icon-wrap">
+            <div class="login-icon">🔐</div>
+        </div>
 
-<div class="auth-card" style="max-width:560px; margin:0 auto;">
-    <div class="section-head">
-        <h2>Вход</h2>
-        <p>Войдите в аккаунт, чтобы смотреть свои заявки и их статусы.</p>
+        <div class="login-head">
+            <h2>Вход в аккаунт</h2>
+            <p>Введите логин и пароль, чтобы продолжить</p>
+        </div>
+
+        <form method="POST" class="login-form" autocomplete="on">
+            <div class="form-group">
+                <label for="username">ЛОГИН</label>
+                <div class="input-shell input-shell-lg">
+                    <span class="input-icon">👤</span>
+                    <input
+                        type="text"
+                        id="username"
+                        name="username"
+                        placeholder="Введите логин"
+                        value="{{ request.form.get('username', '') }}"
+                        required
+                    >
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="password">ПАРОЛЬ</label>
+                <div class="input-shell">
+                    <span class="input-icon">🔒</span>
+                    <input
+                        type="password"
+                        id="password"
+                        name="password"
+                        placeholder="Введите пароль"
+                        required
+                    >
+                </div>
+            </div>
+
+            <div class="login-meta">
+                <a href="{{ url_for('forgot_password') }}" class="meta-link">Забыли пароль?</a>
+            </div>
+
+            <button type="submit" class="login-submit">
+                Войти →
+            </button>
+
+            <div class="login-divider">
+                <span>или</span>
+            </div>
+
+            <div class="login-links">
+                <a href="{{ url_for('register') }}" class="login-link">✨ Создать аккаунт</a>
+                <a href="{{ url_for('index') }}" class="login-link">🏠 На главную</a>
+            </div>
+        </form>
     </div>
+</section>
 
-    <form method="POST">
-        <div class="form-group">
-            <label class="form-label">Логин</label>
-            <input type="text" name="username" required>
-        </div>
+<style>
+.auth-shell{
+    min-height:calc(100vh - 180px);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:40px 16px;
+}
 
-        <div class="form-group">
-            <label class="form-label">Пароль</label>
-            <input type="password" name="password" required>
-        </div>
+.login-card{
+    width:100%;
+    max-width:520px;
+    padding:34px 34px 28px;
+    border-radius:28px;
+    background:linear-gradient(145deg, rgba(16,26,47,.97), rgba(23,39,71,.96));
+    border:1px solid rgba(255,255,255,.08);
+    box-shadow:
+        0 24px 60px rgba(0,0,0,.35),
+        inset 0 1px 0 rgba(255,255,255,.04);
+}
 
-        <div style="display:flex; gap:12px; flex-wrap:wrap; align-items:center;">
-            <button type="submit" class="btn btn-primary">Войти</button>
-            <a href="{{ url_for('forgot_password') }}" class="btn btn-light">Забыл пароль</a>
-        </div>
-    </form>
-</div>
+.login-icon-wrap{
+    display:flex;
+    justify-content:center;
+    margin-bottom:18px;
+}
 
+.login-icon{
+    width:74px;
+    height:74px;
+    border-radius:22px;
+    display:grid;
+    place-items:center;
+    font-size:30px;
+    color:#fff;
+    background:linear-gradient(135deg, #1bd3d0, #6b7dff);
+    box-shadow:0 16px 34px rgba(27,211,208,.22);
+}
+
+.login-head{
+    text-align:center;
+    margin-bottom:24px;
+}
+
+.login-head h2{
+    margin:0 0 10px;
+    font-size:clamp(30px, 4vw, 40px);
+    color:#ffffff;
+    font-weight:800;
+}
+
+.login-head p{
+    margin:0;
+    color:rgba(220,231,255,.62);
+}
+
+.login-form{
+    display:flex;
+    flex-direction:column;
+    gap:16px;
+}
+
+.form-group label{
+    display:block;
+    margin-bottom:8px;
+    color:#dbe6ff;
+    font-size:13px;
+    font-weight:700;
+    letter-spacing:.04em;
+}
+
+.input-shell{
+    display:flex;
+    align-items:center;
+    min-height:58px;
+    border-radius:18px;
+    background:rgba(255,255,255,.06);
+    border:1px solid rgba(255,255,255,.10);
+    overflow:hidden;
+    transition:.2s ease;
+}
+
+.input-shell:focus-within{
+    border-color:rgba(109,124,255,.72);
+    box-shadow:0 0 0 4px rgba(109,124,255,.14);
+    background:rgba(255,255,255,.08);
+}
+
+.input-shell-lg{
+    border-color:rgba(109,124,255,.55);
+    box-shadow:0 0 0 4px rgba(109,124,255,.10);
+}
+
+.input-icon{
+    width:48px;
+    display:grid;
+    place-items:center;
+    flex-shrink:0;
+    font-size:16px;
+    color:rgba(173,191,255,.9);
+}
+
+.input-shell input{
+    width:100%;
+    height:58px;
+    border:none !important;
+    outline:none !important;
+    background:transparent !important;
+    background-color:transparent !important;
+    box-shadow:none !important;
+    color:#f3f7ff !important;
+    padding:16px 18px 16px 0 !important;
+    -webkit-appearance:none;
+    appearance:none;
+    font-size:16px;
+}
+
+.input-shell input::placeholder{
+    color:rgba(219,230,255,.38) !important;
+}
+
+.input-shell input:focus,
+.input-shell input:active{
+    background:transparent !important;
+    background-color:transparent !important;
+    color:#ffffff !important;
+    box-shadow:none !important;
+    border:none !important;
+    outline:none !important;
+}
+
+.input-shell input:-webkit-autofill,
+.input-shell input:-webkit-autofill:hover,
+.input-shell input:-webkit-autofill:focus,
+.input-shell input:-webkit-autofill:active{
+    -webkit-text-fill-color:#ffffff !important;
+    -webkit-box-shadow:0 0 0 1000px rgba(36,48,78,1) inset !important;
+    box-shadow:0 0 0 1000px rgba(36,48,78,1) inset !important;
+    transition:background-color 9999s ease-in-out 0s;
+    border:none !important;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea,
+.form-control{
+    background:transparent !important;
+    background-color:transparent !important;
+    color:#f3f7ff !important;
+    border:none !important;
+    box-shadow:none !important;
+}
+
+.form-control:focus{
+    background:transparent !important;
+    background-color:transparent !important;
+    color:#ffffff !important;
+    border:none !important;
+    box-shadow:none !important;
+}
+
+.login-meta{
+    display:flex;
+    justify-content:flex-end;
+    margin-top:-4px;
+}
+
+.meta-link{
+    color:#9fc5ff;
+    text-decoration:none;
+    font-size:14px;
+}
+
+.meta-link:hover{
+    color:#c9ddff;
+    text-decoration:underline;
+}
+
+.login-submit{
+    margin-top:6px;
+    min-height:58px;
+    border:none;
+    border-radius:18px;
+    background:linear-gradient(135deg, #1bd3d0, #7cf0e0);
+    color:#0d1b2f;
+    font-size:18px;
+    font-weight:800;
+    cursor:pointer;
+    transition:.2s ease;
+}
+
+.login-submit:hover{
+    transform:translateY(-1px);
+    box-shadow:0 14px 28px rgba(27,211,208,.22);
+}
+
+.login-divider{
+    display:flex;
+    align-items:center;
+    gap:14px;
+    margin-top:8px;
+    color:rgba(255,255,255,.42);
+}
+
+.login-divider::before,
+.login-divider::after{
+    content:"";
+    flex:1;
+    height:1px;
+    background:rgba(255,255,255,.10);
+}
+
+.login-links{
+    display:grid;
+    grid-template-columns:repeat(2, minmax(0, 1fr));
+    gap:14px;
+}
+
+.login-link{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    min-height:48px;
+    border-radius:16px;
+    background:rgba(255,255,255,.04);
+    border:1px solid rgba(255,255,255,.08);
+    color:#dce6ff;
+    text-decoration:none;
+    font-weight:600;
+    transition:.2s ease;
+}
+
+.login-link:hover{
+    background:rgba(255,255,255,.08);
+    color:#ffffff;
+}
+
+@media (max-width:760px){
+    .login-card{
+        padding:24px 18px 20px;
+        border-radius:22px;
+    }
+
+    .login-links{
+        grid-template-columns:1fr;
+    }
+}
+</style>
 {% endblock %}
