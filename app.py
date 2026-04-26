@@ -96,6 +96,11 @@ CAR_BRANDS = {
 }
 
 
+PHONE_MASK_RE = re.compile(r'^\+7 \(\d{3}\) \d{3}-\d{2}-\d{2}$')
+EMAIL_LATIN_RE = re.compile(r'^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$')
+USERNAME_RE = re.compile(r'^[A-Za-zA-Яа-яЁё0-9_.-]+$')
+
+
 class User(db.Model):
     __tablename__ = 'users'
 
@@ -125,6 +130,13 @@ class Order(db.Model):
     created_at = db.Column(db.DateTime, default=db.func.now())
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)
 
+    email = db.Column(db.String(150), nullable=True)
+    city = db.Column(db.String(100), nullable=True)
+    year = db.Column(db.String(20), nullable=True)
+    vin = db.Column(db.String(100), nullable=True)
+    reg_number = db.Column(db.String(50), nullable=True)
+    message = db.Column(db.Text, nullable=True)
+
 
 class Review(db.Model):
     __tablename__ = 'reviews'
@@ -135,6 +147,36 @@ class Review(db.Model):
     rating = db.Column(db.Integer, nullable=False, default=5)
     is_published = db.Column(db.Boolean, default=True)
     created_at = db.Column(db.DateTime, default=db.func.now())
+
+
+def clean_text(value):
+    return (value or '').strip()
+
+
+def normalize_phone(phone_raw):
+    phone_raw = clean_text(phone_raw)
+    digits = re.sub(r'\D', '', phone_raw)
+
+    if digits.startswith('8'):
+        digits = '7' + digits[1:]
+
+    if len(digits) == 10:
+        digits = '7' + digits
+
+    if len(digits) != 11 or not digits.startswith('7'):
+        return None
+
+    return f'+7 ({digits[1:4]}) {digits[4:7]}-{digits[7:9]}-{digits[9:11]}'
+
+
+def normalize_email(email_raw):
+    email = clean_text(email_raw).lower()
+    return email if email else ''
+
+
+def is_latin_email(email):
+    email = normalize_email(email)
+    return bool(EMAIL_LATIN_RE.fullmatch(email))
 
 
 def send_email(to_email, subject, html_message):
@@ -242,12 +284,12 @@ def privacy():
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
-        full_name = request.form.get('full_name', '').strip()
-        email = request.form.get('email', '').strip().lower()
-        phone = request.form.get('phone', '').strip()
-        username = request.form.get('username', '').strip()
-        password = request.form.get('password', '').strip()
-        confirm_password = request.form.get('password2', '').strip()
+        full_name = clean_text(request.form.get('full_name'))
+        email = normalize_email(request.form.get('email'))
+        phone_raw = clean_text(request.form.get('phone'))
+        username = clean_text(request.form.get('username'))
+        password = clean_text(request.form.get('password'))
+        confirm_password = clean_text(request.form.get('password2'))
         consent = request.form.get('policy')
 
         if not full_name:
@@ -262,22 +304,19 @@ def register():
             flash('Логин должен быть не короче 3 символов.')
             return render_template('register.html')
 
-        if not re.fullmatch(r'[A-Za-zA-Яа-яЁё0-9_.-]+', username):
+        if not USERNAME_RE.fullmatch(username):
             flash('Логин содержит недопустимые символы.')
             return render_template('register.html')
 
-        if email and not re.fullmatch(r'[^@]+@[^@]+\.[^@]+', email):
-            flash('Введите корректный email.')
+        if email and not is_latin_email(email):
+            flash('Email должен содержать только латиницу и корректный формат.')
             return render_template('register.html')
 
-        if phone:
-            clean_phone = re.sub(r'\D', '', phone)
-            if clean_phone.startswith('8'):
-                clean_phone = '7' + clean_phone[1:]
-            if clean_phone.startswith('7') and len(clean_phone) == 11:
-                phone = '+' + clean_phone
-            if not re.fullmatch(r'\+7[0-9]{10}', phone):
-                flash('Введите телефон в формате +79991234567.')
+        phone = None
+        if phone_raw:
+            phone = normalize_phone(phone_raw)
+            if not phone:
+                flash('Введите телефон в формате +7 (999) 999-99-99.')
                 return render_template('register.html')
 
         if len(password) < 6:
@@ -368,7 +407,7 @@ def login():
 @app.route('/forgot-password', methods=['GET', 'POST'])
 def forgot_password():
     if request.method == 'POST':
-        email = request.form['email'].strip().lower()
+        email = normalize_email(request.form['email'])
         user = User.query.filter_by(email=email).first()
 
         if user:
@@ -485,43 +524,76 @@ def contact():
         current_user = User.query.get(session['user_id'])
 
     if request.method == 'POST':
-        first_name = request.form['first_name'].strip()
-        last_name = request.form['last_name'].strip()
-        phone = request.form['phone'].strip()
-        brand = request.form['brand'].strip()
-        car_model = request.form['car_model'].strip()
-        service = request.form['service'].strip()
+        name = clean_text(request.form.get('name'))
+        phone_raw = clean_text(request.form.get('phone'))
+        email = normalize_email(request.form.get('email'))
+        city = clean_text(request.form.get('city'))
+        brand = clean_text(request.form.get('brand'))
+        model = clean_text(request.form.get('model'))
+        year = clean_text(request.form.get('year'))
+        service = clean_text(request.form.get('service'))
+        vin = clean_text(request.form.get('vin'))
+        reg_number = clean_text(request.form.get('reg_number'))
+        message = clean_text(request.form.get('message'))
+        policy = request.form.get('policy')
 
-        full_name = f'{first_name} {last_name}'.strip()
+        if not name:
+            flash('Введите имя.')
+            return render_template('contact.html', user=current_user, car_brands=CAR_BRANDS)
 
-        if not re.fullmatch(r'\+7[0-9]{10}', phone):
-            flash('Введите номер телефона строго в формате +79991234567')
+        phone = normalize_phone(phone_raw)
+        if not phone:
+            flash('Введите телефон в формате +7 (999) 999-99-99.')
+            return render_template('contact.html', user=current_user, car_brands=CAR_BRANDS)
+
+        if email and not is_latin_email(email):
+            flash('Email должен содержать только латиницу и корректный формат.')
+            return render_template('contact.html', user=current_user, car_brands=CAR_BRANDS)
+
+        if not brand or brand not in CAR_BRANDS:
+            flash('Выберите марку автомобиля.')
             return render_template('contact.html', user=current_user, car_brands=CAR_BRANDS)
 
         valid_models = CAR_BRANDS.get(brand, [])
-        if car_model not in valid_models:
+        if not model or model not in valid_models:
             flash('Выберите модель автомобиля только из списка.')
             return render_template('contact.html', user=current_user, car_brands=CAR_BRANDS)
 
+        if not service:
+            flash('Выберите услугу.')
+            return render_template('contact.html', user=current_user, car_brands=CAR_BRANDS)
+
+        if not policy:
+            flash('Необходимо согласие с политикой конфиденциальности.')
+            return render_template('contact.html', user=current_user, car_brands=CAR_BRANDS)
+
         order = Order(
-            name=full_name,
+            name=name,
             phone=phone,
-            car_model=f'{brand} {car_model}',
+            email=email if email else None,
+            city=city if city else None,
+            car_model=f'{brand} {model}',
+            year=year if year else None,
             service=service,
+            vin=vin if vin else None,
+            reg_number=reg_number if reg_number else None,
+            message=message if message else None,
             user_id=session.get('user_id')
         )
         db.session.add(order)
         db.session.commit()
 
-        if current_user and current_user.email:
+        recipient_email = email or (current_user.email if current_user and current_user.email else None)
+        if recipient_email:
             send_email(
-                current_user.email,
+                recipient_email,
                 'Ваша заявка принята',
                 f'''
-                <h2>Здравствуйте, {full_name}!</h2>
+                <h2>Здравствуйте, {name}!</h2>
                 <p>Ваша заявка успешно создана.</p>
-                <p><b>Автомобиль:</b> {brand} {car_model}</p>
+                <p><b>Автомобиль:</b> {brand} {model}</p>
                 <p><b>Услуга:</b> {service}</p>
+                <p><b>Телефон:</b> {phone}</p>
                 <p><b>Статус:</b> новая</p>
                 '''
             )
@@ -684,20 +756,35 @@ def admin_user_role(id):
 
 def add_missing_columns():
     with db.engine.connect() as conn:
-        columns = [row[1] for row in conn.execute(text("PRAGMA table_info(users)")).fetchall()]
+        user_columns = [row[1] for row in conn.execute(text("PRAGMA table_info(users)")).fetchall()]
+        order_columns = [row[1] for row in conn.execute(text("PRAGMA table_info(orders)")).fetchall()]
 
-        if 'first_name' not in columns:
+        if 'first_name' not in user_columns:
             conn.execute(text("ALTER TABLE users ADD COLUMN first_name VARCHAR(100)"))
-        if 'last_name' not in columns:
+        if 'last_name' not in user_columns:
             conn.execute(text("ALTER TABLE users ADD COLUMN last_name VARCHAR(100)"))
-        if 'email' not in columns:
+        if 'email' not in user_columns:
             conn.execute(text("ALTER TABLE users ADD COLUMN email VARCHAR(150)"))
-        if 'phone' not in columns:
+        if 'phone' not in user_columns:
             conn.execute(text("ALTER TABLE users ADD COLUMN phone VARCHAR(20)"))
-        if 'consent_accepted' not in columns:
+        if 'consent_accepted' not in user_columns:
             conn.execute(text("ALTER TABLE users ADD COLUMN consent_accepted BOOLEAN DEFAULT 0"))
-        if 'consent_at' not in columns:
+        if 'consent_at' not in user_columns:
             conn.execute(text("ALTER TABLE users ADD COLUMN consent_at DATETIME"))
+
+        if 'email' not in order_columns:
+            conn.execute(text("ALTER TABLE orders ADD COLUMN email VARCHAR(150)"))
+        if 'city' not in order_columns:
+            conn.execute(text("ALTER TABLE orders ADD COLUMN city VARCHAR(100)"))
+        if 'year' not in order_columns:
+            conn.execute(text("ALTER TABLE orders ADD COLUMN year VARCHAR(20)"))
+        if 'vin' not in order_columns:
+            conn.execute(text("ALTER TABLE orders ADD COLUMN vin VARCHAR(100)"))
+        if 'reg_number' not in order_columns:
+            conn.execute(text("ALTER TABLE orders ADD COLUMN reg_number VARCHAR(50)"))
+        if 'message' not in order_columns:
+            conn.execute(text("ALTER TABLE orders ADD COLUMN message TEXT"))
+
         conn.commit()
 
 
@@ -713,7 +800,7 @@ with app.app_context():
             first_name='Главный',
             last_name='Администратор',
             email='admin@example.com',
-            phone='+79990000001',
+            phone='+7 (999) 000-00-01',
             consent_accepted=True
         )
         db.session.add(admin_user)
@@ -727,7 +814,7 @@ with app.app_context():
             first_name='Менеджер',
             last_name='AutoKey',
             email='manager@example.com',
-            phone='+79990000002',
+            phone='+7 (999) 000-00-02',
             consent_accepted=True
         )
         db.session.add(manager_user)
