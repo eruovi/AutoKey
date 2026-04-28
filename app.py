@@ -739,8 +739,8 @@ def contact():
         if session.get('user_id'):
             create_notification(
                 session['user_id'],
-                'Новая заявка создана',
-                f'Заявка №{order.id} успешно создана. Статус: новая.'
+                'Заявка создана',
+                f'Заявка №{order.id} успешно отправлена.'
             )
 
         flash('Заявка успешно отправлена.')

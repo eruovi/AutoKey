@@ -80,7 +80,7 @@
                     <div class="input-shell select-shell">
                         <select id="brand" name="brand" required>
                             <option value="">Выберите марку</option>
-                            {% for brand in car_brands.keys() %}
+                            {% for brand in carbrands.keys() %}
                             <option value="{{ brand }}" {% if request.form.get('brand') == brand %}selected{% endif %}>{{ brand }}</option>
                             {% endfor %}
                         </select>
@@ -144,14 +144,14 @@
                 </div>
 
                 <div class="form-group">
-                    <label class="form-label" for="reg_number">Госномер РФ / если есть</label>
+                    <label class="form-label" for="regnumber">Госномер РФ / если есть</label>
                     <div class="input-shell">
                         <input
                             type="text"
-                            id="reg_number"
-                            name="reg_number"
+                            id="regnumber"
+                            name="regnumber"
                             placeholder="Например: Х940КТ777"
-                            value="{{ request.form.get('reg_number', '') }}"
+                            value="{{ request.form.get('regnumber', '') }}"
                             maxlength="9"
                         >
                     </div>
@@ -168,7 +168,9 @@
             <label class="contact-policy">
                 <input type="checkbox" name="policy" required {% if request.form.get('policy') %}checked{% endif %}>
                 <span>
-                    Я согласен с <a href="{{ url_for('privacy') }}" target="_blank" rel="noopener noreferrer">Политикой конфиденциальности</a> и обработкой персональных данных в соответствии с 152-ФЗ.
+                    Я согласен с
+                    <a href="{{ url_for('privacy') }}" target="_blank" rel="noopener noreferrer">Политикой конфиденциальности</a>
+                    и обработкой персональных данных в соответствии с 152-ФЗ.
                 </span>
             </label>
 
@@ -249,7 +251,7 @@ const modelSelect = document.getElementById('model');
 const phoneInput = document.getElementById('phone');
 const emailInput = document.getElementById('email');
 const vinInput = document.getElementById('vin');
-const regNumberInput = document.getElementById('reg_number');
+const regNumberInput = document.getElementById('regnumber');
 
 const selectedBrand = "{{ request.form.get('brand', '') }}";
 const selectedModel = "{{ request.form.get('model', '') }}";
