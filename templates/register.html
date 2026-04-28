@@ -118,11 +118,18 @@
             </div>
 
             <label class="register-policy">
-                <input type="checkbox" name="policy" required>
+                <input
+                    type="checkbox"
+                    name="policy"
+                    required
+                    {% if request.form.get('policy') %}checked{% endif %}
+                >
                 <span>
                     Я согласен с
-                    <a href="{{ url_for('privacy') }}">Политикой конфиденциальности</a>
-                    и даю согласие на обработку персональных данных.
+                    <a href="{{ url_for('privacy') }}" target="_blank" rel="noopener noreferrer">
+                        Политикой конфиденциальности
+                    </a>
+                    и даю согласие на обработку персональных данных в соответствии с 152-ФЗ.
                 </span>
             </label>
 

@@ -7,13 +7,47 @@
         <h3 style="margin-top:0;">Админ-панель</h3>
         <a href="{{ url_for('admin_dashboard') }}">Обзор</a>
         <a href="{{ url_for('admin_orders') }}">Заявки</a>
-        <a href="{{ url_for('admin_prices') }}">Прайс</a>
+        <a href="{{ url_for('admin_prices') }}" class="active">Прайс</a>
         <a href="{{ url_for('admin_reviews') }}">Отзывы</a>
         <a href="{{ url_for('admin_users') }}">Пользователи</a>
         <a href="{{ url_for('admin_logout') }}">Выйти</a>
     </aside>
 
     <div class="admin-main">
+        <section class="content-card" style="margin-bottom: 20px;">
+            <div class="section-head">
+                <h2>Добавить услугу</h2>
+                <p>Создай новую услугу для прайса, и она сразу появится на сайте.</p>
+            </div>
+
+            <form method="POST" class="price-editor-form">
+                <input type="hidden" name="action" value="add">
+
+                <div class="price-edit-card">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label class="form-label" for="new-service">Услуга</label>
+                            <input type="text" id="new-service" name="service" placeholder="Например: Вскрытие багажника" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" for="new-price">Цена</label>
+                            <input type="text" id="new-price" name="price" placeholder="Например: от 2000 руб." required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="new-time">Время</label>
+                        <input type="text" id="new-time" name="time" placeholder="Например: 30 минут" required>
+                    </div>
+                </div>
+
+                <div class="admin-form-actions">
+                    <button type="submit">Добавить услугу</button>
+                </div>
+            </form>
+        </section>
+
         <section class="content-card">
             <div class="section-head">
                 <h2>Редактор прайса</h2>
@@ -21,23 +55,27 @@
             </div>
 
             <form method="POST" class="price-editor-form">
+                <input type="hidden" name="action" value="update">
+
                 {% for item in prices %}
                 <div class="price-edit-card">
+                    <input type="hidden" name="listid" value="{{ item.id }}">
+
                     <div class="form-grid">
                         <div class="form-group">
                             <label class="form-label">Услуга</label>
-                            <input type="text" name="service" value="{{ item.service }}" required>
+                            <input type="text" name="listservice" value="{{ item.service }}" required>
                         </div>
 
                         <div class="form-group">
                             <label class="form-label">Цена</label>
-                            <input type="text" name="price" value="{{ item.price }}" required>
+                            <input type="text" name="listprice" value="{{ item.price }}" required>
                         </div>
                     </div>
 
                     <div class="form-group">
                         <label class="form-label">Время</label>
-                        <input type="text" name="time" value="{{ item.time }}" required>
+                        <input type="text" name="listtime" value="{{ item.time }}" required>
                     </div>
                 </div>
                 {% endfor %}

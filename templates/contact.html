@@ -19,7 +19,8 @@
                             id="name"
                             name="name"
                             placeholder="Например: Илья"
-                            value="{{ request.form.get('name', '') }}"
+                            value="{{ request.form.get('name', prefill_name or '') }}"
+                            {% if user %}readonly style="background: rgba(255,255,255,.03); color: #aaa;"{% endif %}
                             required
                         >
                     </div>
@@ -33,10 +34,11 @@
                             id="phone"
                             name="phone"
                             placeholder="+7 (___) ___-__-__"
-                            value="{{ request.form.get('phone', '') }}"
+                            value="{{ request.form.get('phone', prefill_phone or '') }}"
                             inputmode="numeric"
                             autocomplete="tel"
                             maxlength="18"
+                            {% if user %}readonly style="background: rgba(255,255,255,.03); color: #aaa;"{% endif %}
                             required
                         >
                     </div>
@@ -52,9 +54,10 @@
                             id="email"
                             name="email"
                             placeholder="example@mail.com"
-                            value="{{ request.form.get('email', '') }}"
+                            value="{{ request.form.get('email', prefill_email or '') }}"
                             inputmode="email"
                             autocomplete="email"
+                            {% if user %}readonly style="background: rgba(255,255,255,.03); color: #aaa;"{% endif %}
                             pattern="[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}"
                             title="Используйте только латинские буквы, цифры и символы email"
                         >
@@ -108,10 +111,8 @@
                             name="year"
                             placeholder="Например: 2014"
                             value="{{ request.form.get('year', '') }}"
-                            inputmode="numeric"
                             maxlength="4"
                             pattern="\d{4}"
-                            title="Только 4 цифры, например 2014"
                         >
                     </div>
                 </div>
@@ -135,32 +136,14 @@
                 <div class="form-group">
                     <label class="form-label" for="vin">VIN / если есть</label>
                     <div class="input-shell">
-                        <input
-                            type="text"
-                            id="vin"
-                            name="vin"
-                            placeholder="Например: XTA210990Y1234567"
-                            value="{{ request.form.get('vin', '') }}"
-                            maxlength="17"
-                            pattern="[A-HJ-NPR-Z0-9-]+"
-                            title="Только латинские буквы, цифры и дефис"
-                        >
+                        <input type="text" id="vin" name="vin" placeholder="Например: XTA210990Y1234567" value="{{ request.form.get('vin', '') }}" maxlength="17">
                     </div>
                 </div>
 
                 <div class="form-group">
                     <label class="form-label" for="reg_number">Госномер РФ / если есть</label>
                     <div class="input-shell">
-                        <input
-                            type="text"
-                            id="reg_number"
-                            name="reg_number"
-                            placeholder="Например: Х940КТ777"
-                            value="{{ request.form.get('reg_number', '') }}"
-                            maxlength="9"
-                            pattern="[АВЕКМНОРСТУХ]\d{3}[АВЕКМНОРСТУХ]{2}\d{0,3}"
-                            title="Формат: буква, 3 цифры, 2 буквы и до 3 цифр"
-                        >
+                        <input type="text" id="reg_number" name="reg_number" placeholder="Например: Х940КТ777" value="{{ request.form.get('reg_number', '') }}" maxlength="9">
                     </div>
                 </div>
             </div>
@@ -168,20 +151,14 @@
             <div class="form-group">
                 <label class="form-label" for="message">Комментарий</label>
                 <div class="input-shell textarea-shell">
-                    <textarea
-                        id="message"
-                        name="message"
-                        placeholder="Опишите проблему: потерян ключ, нужен дубликат, авто закрыто и т.д."
-                    >{{ request.form.get('message', '') }}</textarea>
+                    <textarea id="message" name="message" placeholder="Опишите проблему: потерян ключ, нужен дубликат, авто закрыто и т.д.">{{ request.form.get('message', '') }}</textarea>
                 </div>
             </div>
 
             <label class="contact-policy">
                 <input type="checkbox" name="policy" required {% if request.form.get('policy') %}checked{% endif %}>
                 <span>
-                    Я согласен с
-                    <a href="{{ url_for('privacy') }}" target="_blank" rel="noopener noreferrer">Политикой конфиденциальности</a>
-                    и даю согласие на обработку персональных данных в соответствии с 152-ФЗ.
+                    Я согласен с <a href="{{ url_for('privacy') }}" target="_blank" rel="noopener noreferrer">Политикой конфиденциальности</a> и обработкой персональных данных в соответствии с 152-ФЗ.
                 </span>
             </label>
 
