@@ -1,22 +1,163 @@
 {% extends 'base.html' %}
 {% block title %}Цены | Автоключи 33{% endblock %}
 {% block content %}
-<section class="table-card">
-    <div class="section-head">
-        <h2>Прайс</h2>
-        <p>Окончательная стоимость зависит от марки авто, сложности и срочности выезда.</p>
+
+<section class="hero">
+    <div class="hero-panel">
+        <div class="hero-kicker">Цены • Прайс • Автоключи • Вскрытие</div>
+        <h1>Понятные цены на автоключи, вскрытие и ремонт замков</h1>
+        <p>
+            Ниже — ориентиры по стоимости самых популярных услуг. Итоговая цена зависит от марки,
+            модели автомобиля, сложности работ и выезда.
+        </p>
+
+        <div class="hero-actions">
+            <a href="{{ url_for('contact') }}" class="btn btn-primary">Уточнить цену</a>
+            <a href="{{ url_for('contact') }}" class="btn btn-light">Оставить заявку</a>
+        </div>
     </div>
-    <table>
-        <thead><tr><th>Услуга</th><th>Цена</th><th>Срок</th></tr></thead>
-        <tbody>
-            {% for item in prices %}
-            <tr>
-                <td>{{ item.service }}</td>
-                <td>{{ item.price }}</td>
-                <td>{{ item.time }}</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+
+    <div class="hero-image-card">
+        <img src="{{ url_for('static', filename='img/chip.jpg') }}" alt="Прайс на услуги автоключей" class="hero-image" width="1200" height="900">
+    </div>
 </section>
+
+<section class="content-card">
+    <div class="section-head">
+        <h2>Основные цены</h2>
+        <p>Ориентиры по самым частым услугам.</p>
+    </div>
+
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>Услуга</th>
+                    <th>Цена</th>
+                    <th>Комментарий</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Изготовление дубликата ключа</td>
+                    <td>от 600 ₽</td>
+                    <td>Обычный механический ключ по образцу.</td>
+                </tr>
+                <tr>
+                    <td>Изготовление дубликата с чипом</td>
+                    <td>от 3000 ₽</td>
+                    <td>Ключ с чипом и привязкой к авто.</td>
+                </tr>
+                <tr>
+                    <td>Изготовление чипа для автозапуска</td>
+                    <td>от 2000 ₽</td>
+                    <td>Подходит для популярных систем запуска.</td>
+                </tr>
+                <tr>
+                    <td>Вскрытие автомобиля</td>
+                    <td>от 400 ₽</td>
+                    <td>Цена зависит от сложности замка и ситуации.</td>
+                </tr>
+                <tr>
+                    <td>Ремонт замка зажигания</td>
+                    <td>от 1100 ₽</td>
+                    <td>Диагностика и восстановление механизма.</td>
+                </tr>
+                <tr>
+                    <td>Ремонт иммобилайзера</td>
+                    <td>от 3000 ₽</td>
+                    <td>По модели автомобиля и состоянию системы.</td>
+                </tr>
+                <tr>
+                    <td>Разблокировка сигнализации</td>
+                    <td>от 500 ₽</td>
+                    <td>При проблемах с охранной системой.</td>
+                </tr>
+                <tr>
+                    <td>Восстановление ключа при полной утере</td>
+                    <td>от 2800 ₽</td>
+                    <td>Только механика, чип и прописка отдельно.</td>
+                </tr>
+                <tr>
+                    <td>Восстановление доступа с выездом</td>
+                    <td>от 3500 ₽</td>
+                    <td>Итог зависит от марки и места выезда.</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</section>
+
+<section class="content-card" style="margin-top: 24px;">
+    <div class="section-head">
+        <h2>Что влияет на цену</h2>
+        <p>Стоимость может меняться из-за нескольких факторов, поэтому финальную сумму лучше уточнять заранее.</p>
+    </div>
+
+    <div class="feature-grid">
+        <div class="feature-card">
+            <div class="feature-icon">🚘</div>
+            <h3>Марка и модель</h3>
+            <p>У разных автомобилей разная сложность замков, ключей и электроники.</p>
+        </div>
+
+        <div class="feature-card">
+            <div class="feature-icon">📡</div>
+            <h3>Наличие чипа</h3>
+            <p>Ключ с чипом и привязкой к иммобилайзеру стоит дороже обычного.</p>
+        </div>
+
+        <div class="feature-card">
+            <div class="feature-icon">🧰</div>
+            <h3>Сложность работ</h3>
+            <p>Вскрытие, ремонт и восстановление ключа требуют разного времени и оборудования.</p>
+        </div>
+
+        <div class="feature-card">
+            <div class="feature-icon">🚗</div>
+            <h3>Выезд на место</h3>
+            <p>При выезде мастера цена может отличаться в зависимости от расстояния и срочности.</p>
+        </div>
+    </div>
+</section>
+
+<section class="content-card" style="margin-top: 24px;">
+    <div class="section-head">
+        <h2>Пакеты по обращениям</h2>
+        <p>Самые частые сценарии, с которыми к нам обращаются клиенты.</p>
+    </div>
+
+    <div class="stats-grid">
+        <div class="stat-card">
+            <strong>Потеряли ключ</strong>
+            <p>Подбор решения, восстановление и при необходимости программирование чипа.</p>
+        </div>
+        <div class="stat-card">
+            <strong>Закрылась машина</strong>
+            <p>Аварийное вскрытие без повреждений и лишних затрат.</p>
+        </div>
+        <div class="stat-card">
+            <strong>Нужен дубль</strong>
+            <p>Изготовим запасной ключ, чтобы избежать срочных проблем в будущем.</p>
+        </div>
+        <div class="stat-card">
+            <strong>Не работает замок</strong>
+            <p>Проверим механизм и предложим ремонт или замену.</p>
+        </div>
+    </div>
+</section>
+
+<section class="content-card" style="margin-top: 24px;">
+    <div class="section-head">
+        <h2>Нужна точная цена?</h2>
+        <p>Напишите нам, и мы подскажем стоимость по вашему автомобилю и ситуации.</p>
+    </div>
+
+    <div class="hero-actions">
+        <a href="{{ url_for('contact') }}" class="btn btn-primary">Уточнить цену</a>
+        <a href="{{ url_for('contacts') }}" class="btn btn-light">Контакты</a>
+        <a href="{{ url_for('reviews') }}" class="btn btn-dark">Отзывы</a>
+    </div>
+</section>
+
 {% endblock %}

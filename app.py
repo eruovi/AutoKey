@@ -11,24 +11,19 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 
 
-
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 TEMPLATES_DIR = os.path.join(BASE_DIR, 'templates')
 STATIC_DIR = os.path.join(BASE_DIR, 'static')
 
-
 app = Flask(__name__, template_folder=TEMPLATES_DIR, static_folder=STATIC_DIR)
 app.secret_key = os.getenv('SECRET_KEY', 'autokey-secret2026')
-
 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(BASE_DIR, 'orders.db')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {'pool_pre_ping': True}
 
-
 db = SQLAlchemy(app)
 serializer = URLSafeTimedSerializer(app.secret_key)
-
 
 PRICES = [
     {'service': 'Изготовление ключа', 'price': 'от 500 руб.', 'time': '30 мин'},
@@ -36,7 +31,6 @@ PRICES = [
     {'service': 'Аварийное вскрытие автомобиля', 'price': 'от 1500 руб.', 'time': '1-2 часа'},
     {'service': 'Ремонт замка зажигания', 'price': 'от 2000 руб.', 'time': '1 час'},
 ]
-
 
 CAR_BRANDS = {
     'Acura': ['CL', 'CSX', 'ILX', 'Integra', 'MDX', 'NSX', 'RDX', 'RL', 'RLX', 'RSX', 'TL', 'TLX', 'TSX', 'ZDX'],
@@ -101,7 +95,6 @@ CAR_BRANDS = {
     'Zeekr': ['001', 'X']
 }
 
-
 PHONE_MASK_RE = re.compile(r'^\+7 \(\d{3}\) \d{3}-\d{2}-\d{2}$')
 EMAIL_LATIN_RE = re.compile(r'^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$')
 USERNAME_RE = re.compile(r'^[A-Za-zA-Яа-яЁё0-9_.-]+$')
@@ -122,6 +115,7 @@ class User(db.Model):
     consent_accepted = db.Column(db.Boolean, default=False)
     consent_at = db.Column(db.DateTime, nullable=True)
     orders = db.relationship('Order', backref='user', lazy=True)
+    notifications = db.relationship('Notification', backref='user_ref', lazy=True, cascade='all, delete-orphan')
 
 
 class Order(db.Model):
@@ -149,6 +143,26 @@ class Review(db.Model):
     text = db.Column(db.Text, nullable=False)
     rating = db.Column(db.Integer, nullable=False, default=5)
     is_published = db.Column(db.Boolean, default=True)
+    created_at = db.Column(db.DateTime, default=db.func.now())
+
+
+class Notification(db.Model):
+    __tablename__ = 'notifications'
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    title = db.Column(db.String(200), nullable=False)
+    message = db.Column(db.Text, nullable=False)
+    is_read = db.Column(db.Boolean, default=False)
+    created_at = db.Column(db.DateTime, default=db.func.now())
+
+
+class ServiceItem(db.Model):
+    __tablename__ = 'service_items'
+    id = db.Column(db.Integer, primary_key=True)
+    service = db.Column(db.String(200), nullable=False)
+    price = db.Column(db.String(100), nullable=False)
+    time = db.Column(db.String(100), nullable=False)
+    is_active = db.Column(db.Boolean, default=True)
     created_at = db.Column(db.DateTime, default=db.func.now())
 
 
@@ -234,6 +248,12 @@ def send_email(to_email, subject, html_message):
         return False
 
 
+def create_notification(user_id, title, message):
+    notification = Notification(user_id=user_id, title=title, message=message)
+    db.session.add(notification)
+    db.session.commit()
+
+
 def generate_reset_token(email):
     return serializer.dumps(email, salt='password-reset-salt')
 
@@ -288,7 +308,8 @@ def services():
 
 @app.route('/prices')
 def prices():
-    return render_template('prices.html', prices=PRICES)
+    services_list = ServiceItem.query.filter_by(is_active=True).order_by(ServiceItem.id.asc()).all()
+    return render_template('prices.html', prices=services_list)
 
 
 @app.route('/gallery')
@@ -637,6 +658,13 @@ def contact():
                 '''
             )
 
+        if session.get('user_id'):
+            create_notification(
+                session['user_id'],
+                'Новая заявка создана',
+                f'Заявка №{order.id} успешно создана. Статус: новая.'
+            )
+
         flash('Заявка успешно отправлена.')
         return redirect(url_for('contact'))
 
@@ -665,6 +693,25 @@ def reviews():
     return render_template('reviews.html', reviews=reviews_list)
 
 
+@app.route('/notifications')
+@login_required
+def notifications():
+    user_notifications = Notification.query.filter_by(user_id=session['user_id']).order_by(Notification.id.desc()).all()
+    return render_template('notifications.html', notifications=user_notifications)
+
+
+@app.route('/notifications/<int:id>/read', methods=['POST'])
+@login_required
+def notification_read(id):
+    notification = Notification.query.get_or_404(id)
+    if notification.user_id != session['user_id']:
+        flash('Нет доступа.')
+        return redirect(url_for('notifications'))
+    notification.is_read = True
+    db.session.commit()
+    return redirect(url_for('notifications'))
+
+
 @app.route('/admin')
 @manager_required
 def admin_dashboard():
@@ -672,15 +719,19 @@ def admin_dashboard():
     total = Order.query.count()
     new = Order.query.filter_by(status='новая').count()
     done = Order.query.filter_by(status='выполнена').count()
+    in_work = Order.query.filter_by(status='в работе').count()
     reviews_count = Review.query.count()
+    services_count = ServiceItem.query.count()
 
     return render_template(
         'admin/dashboard.html',
         total=total,
         new=new,
         done=done,
+        in_work=in_work,
         orders=orders,
-        reviews_count=reviews_count
+        reviews_count=reviews_count,
+        services_count=services_count
     )
 
 
@@ -700,19 +751,25 @@ def admin_order_status(id):
 
     if order.user_id:
         user = User.query.get(order.user_id)
-        if user and user.email:
-            send_email(
-                user.email,
-                'Изменён статус заявки',
-                f'''
-                <h2>Здравствуйте, {user.first_name or user.username}!</h2>
-                <p>Статус вашей заявки изменён.</p>
-                <p><b>Заявка:</b> #{order.id}</p>
-                <p><b>Услуга:</b> {order.service}</p>
-                <p><b>Автомобиль:</b> {order.car_model}</p>
-                <p><b>Новый статус:</b> {order.status}</p>
-                '''
+        if user:
+            create_notification(
+                user.id,
+                'Статус заявки изменён',
+                f'Заявка #{order.id}: статус изменён на "{order.status}". Услуга: {order.service}. Автомобиль: {order.car_model}.'
             )
+            if user.email:
+                send_email(
+                    user.email,
+                    'Изменён статус заявки',
+                    f'''
+                    <h2>Здравствуйте, {user.first_name or user.username}!</h2>
+                    <p>Статус вашей заявки изменён.</p>
+                    <p><b>Заявка:</b> #{order.id}</p>
+                    <p><b>Услуга:</b> {order.service}</p>
+                    <p><b>Автомобиль:</b> {order.car_model}</p>
+                    <p><b>Новый статус:</b> {order.status}</p>
+                    '''
+                )
 
     flash('Статус заявки обновлён.')
     return redirect(url_for('admin_orders'))
@@ -731,23 +788,54 @@ def admin_order_delete(id):
 @app.route('/admin/prices', methods=['GET', 'POST'])
 @manager_required
 def admin_prices():
-    global PRICES
-
     if request.method == 'POST':
-        services = request.form.getlist('service')
-        prices_list = request.form.getlist('price')
-        times = request.form.getlist('time')
+        action = request.form.get('action')
 
-        count = min(len(services), len(prices_list), len(times), len(PRICES))
-        for i in range(count):
-            PRICES[i]['service'] = services[i]
-            PRICES[i]['price'] = prices_list[i]
-            PRICES[i]['time'] = times[i]
+        if action == 'add':
+            service = clean_text(request.form.get('service'))
+            price = clean_text(request.form.get('price'))
+            time_value = clean_text(request.form.get('time'))
 
-        flash('Прайс успешно обновлён.')
-        return redirect(url_for('admin_prices'))
+            if not service or not price or not time_value:
+                flash('Заполните все поля для новой услуги.')
+                return redirect(url_for('admin_prices'))
 
-    return render_template('admin/prices.html', prices=PRICES)
+            item = ServiceItem(service=service, price=price, time=time_value, is_active=True)
+            db.session.add(item)
+            db.session.commit()
+            flash('Услуга добавлена.')
+            return redirect(url_for('admin_prices'))
+
+        if action == 'update':
+            ids = request.form.getlist('id')
+            services = request.form.getlist('service')
+            prices_list = request.form.getlist('price')
+            times = request.form.getlist('time')
+
+            count = min(len(ids), len(services), len(prices_list), len(times))
+            for i in range(count):
+                item = ServiceItem.query.get(int(ids[i]))
+                if item:
+                    item.service = services[i]
+                    item.price = prices_list[i]
+                    item.time = times[i]
+
+            db.session.commit()
+            flash('Прайс успешно обновлён.')
+            return redirect(url_for('admin_prices'))
+
+    services_list = ServiceItem.query.order_by(ServiceItem.id.asc()).all()
+    return render_template('admin/prices.html', prices=services_list)
+
+
+@app.route('/admin/service/<int:id>/delete', methods=['POST'])
+@manager_required
+def admin_service_delete(id):
+    item = ServiceItem.query.get_or_404(id)
+    db.session.delete(item)
+    db.session.commit()
+    flash('Услуга удалена.')
+    return redirect(url_for('admin_prices'))
 
 
 @app.route('/admin/reviews')
@@ -797,6 +885,8 @@ def add_missing_columns():
     with db.engine.connect() as conn:
         user_columns = [row[1] for row in conn.execute(text("PRAGMA table_info(users)")).fetchall()]
         order_columns = [row[1] for row in conn.execute(text("PRAGMA table_info(orders)")).fetchall()]
+        notification_columns = [row[1] for row in conn.execute(text("PRAGMA table_info(notifications)")).fetchall()]
+        service_columns = [row[1] for row in conn.execute(text("PRAGMA table_info(service_items)")).fetchall()]
 
         if 'first_name' not in user_columns:
             conn.execute(text("ALTER TABLE users ADD COLUMN first_name VARCHAR(100)"))
@@ -824,12 +914,46 @@ def add_missing_columns():
         if 'message' not in order_columns:
             conn.execute(text("ALTER TABLE orders ADD COLUMN message TEXT"))
 
+        if not notification_columns:
+            conn.execute(text("""
+                CREATE TABLE notifications (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    user_id INTEGER NOT NULL,
+                    title VARCHAR(200) NOT NULL,
+                    message TEXT NOT NULL,
+                    is_read BOOLEAN DEFAULT 0,
+                    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                    FOREIGN KEY(user_id) REFERENCES users(id)
+                )
+            """))
+
+        if not service_columns:
+            conn.execute(text("""
+                CREATE TABLE service_items (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    service VARCHAR(200) NOT NULL,
+                    price VARCHAR(100) NOT NULL,
+                    time VARCHAR(100) NOT NULL,
+                    is_active BOOLEAN DEFAULT 1,
+                    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+                )
+            """))
         conn.commit()
 
 
 with app.app_context():
     db.create_all()
     add_missing_columns()
+
+    if ServiceItem.query.count() == 0:
+        for item in PRICES:
+            db.session.add(ServiceItem(
+                service=item['service'],
+                price=item['price'],
+                time=item['time'],
+                is_active=True
+            ))
+        db.session.commit()
 
     if not User.query.filter_by(username='admin').first():
         admin_user = User(

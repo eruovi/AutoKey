@@ -2,114 +2,139 @@
 {% block title %}Услуги | Автоключи 33{% endblock %}
 {% block content %}
 
+<section class="hero">
+    <div class="hero-panel">
+        <div class="hero-kicker">Услуги • Автоключи • Вскрытие • Чипы</div>
+        <h1>Услуги по автоключам, замкам и выезду мастера</h1>
+        <p>
+            Помогаем, когда нужен дубликат ключа, аварийное вскрытие, ремонт замка
+            или программирование чип-ключа. Работаем быстро и аккуратно по Владимиру и области.
+        </p>
+
+        <div class="hero-actions">
+            <a href="{{ url_for('contact') }}" class="btn btn-primary">Оставить заявку</a>
+            <a href="{{ url_for('prices') }}" class="btn btn-light">Посмотреть цены</a>
+        </div>
+    </div>
+
+    <div class="hero-image-card">
+        <img src="{{ url_for('static', filename='img/car.jpg') }}" alt="Услуги по автоключам" class="hero-image" width="1200" height="900">
+    </div>
+</section>
+
 <section class="content-card">
     <div class="section-head">
-        <h2>Услуги</h2>
-        <p>Работаем по Владимиру и области с выездом и диагностикой по месту.</p>
+        <h2>Что мы делаем</h2>
+        <p>Основные направления работы, с которыми к нам обращаются чаще всего.</p>
     </div>
 
     <div class="feature-grid">
         <div class="feature-card">
             <div class="feature-icon">🔑</div>
-            <h3>Изготовление ключей</h3>
-            <p>Изготовим ключ любой сложности по замку или образцу.</p>
+            <h3>Изготовление автоключей</h3>
+            <p>Дубликаты по образцу, по замку и при полной утере ключей.</p>
         </div>
 
         <div class="feature-card">
             <div class="feature-icon">🚗</div>
-            <h3>Аварийное вскрытие</h3>
-            <p>Вскрытие авто без повреждений с быстрым выездом.</p>
+            <h3>Аварийное вскрытие авто</h3>
+            <p>Открываем автомобиль без повреждения двери, стекла и замков.</p>
         </div>
 
         <div class="feature-card">
-            <div class="feature-icon">🔧</div>
+            <div class="feature-icon">🧰</div>
             <h3>Ремонт замков</h3>
-            <p>Ремонт и замена дверных замков и замка зажигания.</p>
+            <p>Ремонт дверных замков, багажника, зажигания и личинок.</p>
         </div>
 
         <div class="feature-card">
             <div class="feature-icon">📡</div>
-            <h3>Программирование</h3>
-            <p>Прописка чип-ключей и иммобилайзеров всех популярных марок.</p>
+            <h3>Чип-ключи и иммо</h3>
+            <p>Прописываем чипы, брелоки и иммобилайзеры для авто.</p>
         </div>
-    </div>
-</section>
 
-<section class="content-card" style="margin-top: 24px;">
-    <div class="section-head">
-        <h2>Что мы делаем на выезде</h2>
-        <p>Можно решить проблему на месте без эвакуации и долгого ожидания.</p>
-    </div>
-
-    <div class="feature-grid">
         <div class="feature-card">
             <div class="feature-icon">⚡</div>
-            <h3>Быстрая помощь</h3>
-            <p>Приезжаем по Владимиру и области в кратчайшее время.</p>
-        </div>
-
-        <div class="feature-card">
-            <div class="feature-icon">🛠️</div>
-            <h3>Диагностика на месте</h3>
-            <p>Оцениваем ситуацию сразу на адресе и предлагаем решение без лишних расходов.</p>
+            <h3>Выезд мастера</h3>
+            <p>Приезжаем на место по Владимиру и области, если нужен ремонт на месте.</p>
         </div>
 
         <div class="feature-card">
             <div class="feature-icon">🛡️</div>
-            <h3>Без лишних повреждений</h3>
-            <p>Стараемся открыть, отремонтировать или восстановить всё аккуратно.</p>
-        </div>
-
-        <div class="feature-card">
-            <div class="feature-icon">💬</div>
-            <h3>Понятная цена</h3>
-            <p>Объясняем стоимость до начала работ, без скрытых доплат.</p>
+            <h3>Помощь без повреждений</h3>
+            <p>Стараемся сохранить кузов, замок и электронику в рабочем состоянии.</p>
         </div>
     </div>
 </section>
 
 <section class="content-card" style="margin-top: 24px;">
     <div class="section-head">
-        <h2>Когда обращаться</h2>
-        <p>Собрали частые ситуации, с которыми к нам обращаются чаще всего.</p>
+        <h2>Популярные случаи</h2>
+        <p>Вот с чем чаще всего обращаются клиенты.</p>
+    </div>
+
+    <div class="stats-grid">
+        <div class="stat-card">
+            <strong>Потеряли ключ</strong>
+            <p>Сделаем новый ключ и при необходимости пропишем чип.</p>
+        </div>
+        <div class="stat-card">
+            <strong>Закрылась машина</strong>
+            <p>Откроем авто аккуратно и без лишних повреждений.</p>
+        </div>
+        <div class="stat-card">
+            <strong>Не работает замок</strong>
+            <p>Проверим механизм, отремонтируем или заменим элементы.</p>
+        </div>
+        <div class="stat-card">
+            <strong>Нужен дубль</strong>
+            <p>Изготовим запасной ключ, чтобы не остаться без доступа к авто.</p>
+        </div>
+    </div>
+</section>
+
+<section class="content-card" style="margin-top: 24px;">
+    <div class="section-head">
+        <h2>Как проходит работа</h2>
+        <p>Коротко и без лишней бюрократии.</p>
     </div>
 
     <div class="feature-grid">
         <div class="feature-card">
             <div class="feature-icon">1</div>
-            <h3>Потеряли ключи</h3>
-            <p>Сделаем новый ключ или организуем восстановление по замку.</p>
+            <h3>Вы оставляете заявку</h3>
+            <p>Пишете или звоните, описываете ситуацию и модель автомобиля.</p>
         </div>
 
         <div class="feature-card">
             <div class="feature-icon">2</div>
-            <h3>Захлопнули авто</h3>
-            <p>Поможем открыть автомобиль без повреждений и лишнего стресса.</p>
+            <h3>Уточняем детали</h3>
+            <p>Согласовываем адрес, срок приезда и ориентир по стоимости.</p>
         </div>
 
         <div class="feature-card">
             <div class="feature-icon">3</div>
-            <h3>Не работает замок</h3>
-            <p>Проверим механизм и выполним ремонт или замену.</p>
+            <h3>Приезжает мастер</h3>
+            <p>Выезжаем с нужным инструментом и оборудованием под задачу.</p>
         </div>
 
         <div class="feature-card">
             <div class="feature-icon">4</div>
-            <h3>Нужен чип</h3>
-            <p>Пропишем чип-ключи и иммобилайзеры для разных марок.</p>
+            <h3>Решаем проблему</h3>
+            <p>Делаем ключ, вскрываем авто, ремонтируем замок или прописываем чип.</p>
         </div>
     </div>
 </section>
 
 <section class="content-card" style="margin-top: 24px;">
     <div class="section-head">
-        <h2>Заказать услугу</h2>
-        <p>Оставьте заявку, и мы свяжемся с вами для уточнения деталей.</p>
+        <h2>Хотите уточнить стоимость?</h2>
+        <p>Оставьте заявку — подскажем по срокам и цене именно под вашу ситуацию.</p>
     </div>
 
     <div class="hero-actions">
         <a href="{{ url_for('contact') }}" class="btn btn-primary">Оставить заявку</a>
-        <a href="{{ url_for('prices') }}" class="btn btn-light">Посмотреть цены</a>
+        <a href="{{ url_for('prices') }}" class="btn btn-light">Открыть прайс</a>
         <a href="{{ url_for('contacts') }}" class="btn btn-dark">Контакты</a>
     </div>
 </section>

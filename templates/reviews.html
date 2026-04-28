@@ -46,13 +46,13 @@
         <form method="POST">
             <div class="form-grid">
                 <div class="form-group">
-                    <label class="form-label">Ваше имя</label>
-                    <input type="text" name="author" value="{{ session.get('username') }}" required>
+                    <label class="form-label" for="author">Ваше имя</label>
+                    <input id="author" type="text" name="author" value="{{ session.get('username') }}" required>
                 </div>
 
                 <div class="form-group">
-                    <label class="form-label">Оценка</label>
-                    <select name="rating" required>
+                    <label class="form-label" for="rating">Оценка</label>
+                    <select id="rating" name="rating" required>
                         <option value="5">5 — Отлично</option>
                         <option value="4">4 — Хорошо</option>
                         <option value="3">3 — Нормально</option>
@@ -63,8 +63,13 @@
             </div>
 
             <div class="form-group">
-                <label class="form-label">Текст отзыва</label>
-                <textarea name="text" placeholder="Например: быстро приехали, аккуратно открыли машину, всё объяснили по цене..." required></textarea>
+                <label class="form-label" for="review-text">Текст отзыва</label>
+                <textarea
+                    id="review-text"
+                    name="text"
+                    placeholder="Например: быстро приехали, аккуратно открыли машину, всё объяснили по цене..."
+                    required
+                ></textarea>
             </div>
 
             <button type="submit">Отправить отзыв</button>

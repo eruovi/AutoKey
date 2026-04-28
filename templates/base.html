@@ -18,6 +18,7 @@
             --text: #f8fbff;
             --text-soft: #bfd0e2;
             --text-muted: #8ea3ba;
+            --muted: #8ea3ba;
             --line: rgba(255, 255, 255, 0.12);
             --line-strong: rgba(255, 255, 255, 0.2);
             --accent: #15d1c5;
@@ -655,6 +656,12 @@
             border-color: rgba(255,93,115,.22);
         }
 
+        .status.working {
+            background: rgba(255, 196, 86, .14);
+            color: #ffe2a3;
+            border-color: rgba(255, 196, 86, .22);
+        }
+
         .admin-layout {
             display: grid;
             grid-template-columns: 260px 1fr;
@@ -682,7 +689,8 @@
             border: 1px solid transparent;
         }
 
-        .admin-sidebar a:hover {
+        .admin-sidebar a:hover,
+        .admin-sidebar a.active {
             background: linear-gradient(135deg, rgba(21,209,197,.14), rgba(79,140,255,.12));
             border-color: rgba(255,255,255,.08);
             transform: translateX(3px);
@@ -1088,7 +1096,7 @@
                 <span>Автоключи 33</span>
             </a>
 
-            <button class="menu-toggle" type="button" aria-label="Открыть меню" aria-expanded="false">
+            <button class="menu-toggle" type="button" aria-label="Открыть меню" aria-expanded="false" aria-controls="mobileMenu mobileActions">
                 ☰
             </button>
 
@@ -1109,6 +1117,7 @@
                     {% if session.get('role') in ['admin', 'manager'] %}
                         <a href="{{ url_for('admin_dashboard') }}" class="btn btn-dark">Админ-панель</a>
                     {% endif %}
+                    <a href="{{ url_for('my_orders') }}" class="btn btn-light">Мои заявки</a>
                     <a href="{{ url_for('logout') }}" class="btn btn-dark">Выйти</a>
                 {% else %}
                     <a href="{{ url_for('login') }}" class="btn btn-light">Войти</a>

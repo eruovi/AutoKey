@@ -122,12 +122,9 @@
                         <select id="service" name="service" required>
                             <option value="">Выберите услугу</option>
                             <option value="Изготовление ключа" {% if request.form.get('service') == 'Изготовление ключа' %}selected{% endif %}>Изготовление ключа</option>
-                            <option value="Программирование ключа" {% if request.form.get('service') == 'Программирование ключа' %}selected{% endif %}>Программирование ключа</option>
-                            <option value="Вскрытие автомобиля" {% if request.form.get('service') == 'Вскрытие автомобиля' %}selected{% endif %}>Вскрытие автомобиля</option>
-                            <option value="Ремонт корпуса ключа" {% if request.form.get('service') == 'Ремонт корпуса ключа' %}selected{% endif %}>Ремонт корпуса ключа</option>
-                            <option value="Замена батарейки" {% if request.form.get('service') == 'Замена батарейки' %}selected{% endif %}>Замена батарейки</option>
-                            <option value="Отключение утерянных ключей" {% if request.form.get('service') == 'Отключение утерянных ключей' %}selected{% endif %}>Отключение утерянных ключей</option>
-                            <option value="Аварийный выезд" {% if request.form.get('service') == 'Аварийный выезд' %}selected{% endif %}>Аварийный выезд</option>
+                            <option value="Программирование чип-ключа" {% if request.form.get('service') == 'Программирование чип-ключа' %}selected{% endif %}>Программирование чип-ключа</option>
+                            <option value="Аварийное вскрытие автомобиля" {% if request.form.get('service') == 'Аварийное вскрытие автомобиля' %}selected{% endif %}>Аварийное вскрытие автомобиля</option>
+                            <option value="Ремонт замка зажигания" {% if request.form.get('service') == 'Ремонт замка зажигания' %}selected{% endif %}>Ремонт замка зажигания</option>
                             <option value="Другое" {% if request.form.get('service') == 'Другое' %}selected{% endif %}>Другое</option>
                         </select>
                     </div>
@@ -184,7 +181,7 @@
                 <span>
                     Я согласен с
                     <a href="{{ url_for('privacy') }}" target="_blank" rel="noopener noreferrer">Политикой конфиденциальности</a>
-                    и даю согласие на обработку персональных данных.
+                    и даю согласие на обработку персональных данных в соответствии с 152-ФЗ.
                 </span>
             </label>
 
@@ -276,20 +273,16 @@ function sortModels(list) {
 
 function updateModels(brand, selected = "") {
     modelSelect.innerHTML = "";
-
     if (!brand || !carModels[brand]) {
         modelSelect.innerHTML = '<option value="">Сначала выберите марку</option>';
         modelSelect.disabled = true;
         return;
     }
-
     modelSelect.disabled = false;
-
     const firstOption = document.createElement('option');
     firstOption.value = "";
     firstOption.textContent = "Выберите модель";
     modelSelect.appendChild(firstOption);
-
     sortModels(carModels[brand]).forEach(model => {
         const option = document.createElement('option');
         option.value = model;

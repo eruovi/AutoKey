@@ -1,49 +1,67 @@
 {% extends 'admin/base.html' %}
 {% block title %}Обзор | Админ-панель{% endblock %}
-{% block content %}
 
+{% block content %}
 <div class="admin-layout">
     <aside class="admin-sidebar">
-        <h3 style="margin-top:0;">Админ-панель</h3>
-        <a href="{{ url_for('admin_dashboard') }}">Обзор</a>
-        <a href="{{ url_for('admin_orders') }}">Заявки</a>
-        <a href="{{ url_for('admin_prices') }}">Прайс</a>
-        <a href="{{ url_for('admin_reviews') }}">Отзывы</a>
-        <a href="{{ url_for('admin_users') }}">Пользователи</a>
-        <a href="{{ url_for('admin_logout') }}">Выйти</a>
+        <div class="sidebar-brand">
+            <h3>Админ-панель</h3>
+            <p>Управление заявками и контентом</p>
+        </div>
+
+        <nav class="sidebar-nav">
+            <a href="{{ url_for('admin_dashboard') }}" class="active">Обзор</a>
+            <a href="{{ url_for('admin_orders') }}">Заявки</a>
+            <a href="{{ url_for('admin_prices') }}">Прайс</a>
+            <a href="{{ url_for('admin_reviews') }}">Отзывы</a>
+            <a href="{{ url_for('admin_users') }}">Пользователи</a>
+            <a href="{{ url_for('admin_logout') }}">Выйти</a>
+        </nav>
     </aside>
 
-    <div class="admin-main">
-        <section class="content-card">
+    <main class="admin-main">
+        <section class="content-card admin-hero">
             <div class="section-head">
                 <h2>Обзор системы</h2>
                 <p>Ключевые показатели, быстрые действия и последние заявки в одной панели.</p>
             </div>
 
             <div class="stats-grid">
-                <div class="stat-card">
+                <article class="stat-card">
                     <h3>Всего заявок</h3>
                     <strong>{{ total }}</strong>
                     <p>Общее количество заявок в базе.</p>
-                </div>
+                </article>
 
-                <div class="stat-card">
+                <article class="stat-card">
                     <h3>Новые заявки</h3>
                     <strong>{{ new }}</strong>
                     <p>Требуют внимания в первую очередь.</p>
-                </div>
+                </article>
 
-                <div class="stat-card">
+                <article class="stat-card">
+                    <h3>В работе</h3>
+                    <strong>{{ in_work }}</strong>
+                    <p>Заявки, над которыми сейчас работают.</p>
+                </article>
+
+                <article class="stat-card">
                     <h3>Выполнено</h3>
                     <strong>{{ done }}</strong>
                     <p>Завершённые обращения клиентов.</p>
-                </div>
+                </article>
 
-                <div class="stat-card">
+                <article class="stat-card">
                     <h3>Отзывы</h3>
                     <strong>{{ reviews_count }}</strong>
                     <p>Всего отзывов в системе.</p>
-                </div>
+                </article>
+
+                <article class="stat-card">
+                    <h3>Услуги</h3>
+                    <strong>{{ services_count }}</strong>
+                    <p>Активные позиции в прайсе.</p>
+                </article>
             </div>
         </section>
 
@@ -80,7 +98,7 @@
             </div>
         </section>
 
-        <section class="table-card">
+        <section class="table-card content-card">
             <div class="section-head">
                 <h2>Последние заявки</h2>
                 <p>Свежие обращения клиентов, которые недавно поступили через сайт.</p>
@@ -111,7 +129,7 @@
                                 {% if order.status == 'выполнена' %}
                                     <span class="status done">{{ order.status }}</span>
                                 {% elif order.status == 'в работе' %}
-                                    <span class="status">{{ order.status }}</span>
+                                    <span class="status working">{{ order.status }}</span>
                                 {% else %}
                                     <span class="status hidden">{{ order.status }}</span>
                                 {% endif %}
@@ -122,7 +140,7 @@
                 </table>
             </div>
 
-            <div style="margin-top: 18px; display:flex; gap:12px; flex-wrap:wrap;">
+            <div class="actions-row">
                 <a href="{{ url_for('admin_orders') }}" class="btn btn-primary">Открыть все заявки</a>
                 <a href="{{ url_for('admin_reviews') }}" class="btn btn-light">Перейти к отзывам</a>
             </div>
@@ -166,7 +184,258 @@
                 </div>
             </div>
         </section>
-    </div>
+    </main>
 </div>
 
+<style>
+.admin-layout {
+    display: grid;
+    grid-template-columns: 280px minmax(0, 1fr);
+    gap: 20px;
+    align-items: start;
+}
+
+.admin-sidebar {
+    position: sticky;
+    top: 20px;
+    padding: 22px;
+    border-radius: 22px;
+    background: rgba(255,255,255,.05);
+    border: 1px solid rgba(255,255,255,.10);
+    backdrop-filter: blur(14px);
+}
+
+.sidebar-brand h3 {
+    margin: 0 0 6px;
+    font-size: 22px;
+}
+
+.sidebar-brand p {
+    margin: 0 0 18px;
+    opacity: .75;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.sidebar-nav {
+    display: grid;
+    gap: 10px;
+}
+
+.sidebar-nav a {
+    display: flex;
+    align-items: center;
+    min-height: 46px;
+    padding: 0 14px;
+    border-radius: 14px;
+    text-decoration: none;
+    color: inherit;
+    background: transparent;
+    border: 1px solid transparent;
+    transition: var(--transition);
+}
+
+.sidebar-nav a:hover,
+.sidebar-nav a.active {
+    background: rgba(27, 211, 208, .10);
+    border-color: rgba(27, 211, 208, .18);
+}
+
+.admin-main {
+    display: grid;
+    gap: 18px;
+    min-width: 0;
+}
+
+.admin-hero {
+    padding: 24px;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 14px;
+}
+
+.stat-card {
+    padding: 18px;
+    border-radius: 18px;
+    background: rgba(255,255,255,.04);
+    border: 1px solid rgba(255,255,255,.10);
+}
+
+.stat-card h3 {
+    margin: 0 0 10px;
+    font-size: 14px;
+    opacity: .8;
+    font-weight: 600;
+}
+
+.stat-card strong {
+    display: block;
+    font-size: 32px;
+    line-height: 1;
+    margin-bottom: 8px;
+}
+
+.stat-card p {
+    margin: 0;
+    opacity: .72;
+    line-height: 1.5;
+    font-size: 14px;
+}
+
+.feature-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 14px;
+}
+
+.feature-card {
+    display: block;
+    padding: 18px;
+    border-radius: 18px;
+    background: rgba(255,255,255,.04);
+    border: 1px solid rgba(255,255,255,.10);
+    text-decoration: none;
+    color: inherit;
+    transition: var(--transition);
+    min-height: 170px;
+}
+
+.feature-card:hover {
+    transform: translateY(-2px);
+    border-color: rgba(27, 211, 208, .20);
+    background: rgba(27, 211, 208, .07);
+}
+
+.feature-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    display: grid;
+    place-items: center;
+    margin-bottom: 14px;
+    background: rgba(27, 211, 208, .10);
+    color: #1bd3d0;
+    font-weight: 800;
+}
+
+.feature-card h3 {
+    margin: 0 0 8px;
+    font-size: 18px;
+}
+
+.feature-card p {
+    margin: 0;
+    opacity: .74;
+    line-height: 1.55;
+}
+
+.table-card {
+    padding: 24px;
+}
+
+.table-wrap {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.admin-orders-table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 760px;
+}
+
+.admin-orders-table th,
+.admin-orders-table td {
+    padding: 14px 12px;
+    border-bottom: 1px solid rgba(255,255,255,.08);
+    text-align: left;
+    vertical-align: middle;
+}
+
+.admin-orders-table th {
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    opacity: .75;
+}
+
+.text-cell {
+    max-width: 240px;
+}
+
+.user-name-cell {
+    font-weight: 700;
+}
+
+.status {
+    display: inline-flex;
+    align-items: center;
+    min-height: 30px;
+    padding: 0 12px;
+    border-radius: 999px;
+    background: rgba(27, 211, 208, .12);
+    color: #7bf0eb;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.status.done {
+    background: rgba(67, 122, 34, .18);
+    color: #8bd56a;
+}
+
+.status.working {
+    background: rgba(255, 193, 7, .15);
+    color: #ffd86a;
+}
+
+.status.hidden {
+    background: rgba(255,255,255,.08);
+    color: rgba(255,255,255,.72);
+}
+
+.actions-row {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-top: 18px;
+}
+
+.info-card {
+    padding: 20px;
+    border-radius: 18px;
+    background: rgba(255,255,255,.04);
+    border: 1px solid rgba(255,255,255,.10);
+}
+
+@media (max-width: 1100px) {
+    .admin-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .admin-sidebar {
+        position: static;
+    }
+
+    .stats-grid,
+    .feature-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 700px) {
+    .stats-grid,
+    .feature-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .admin-hero,
+    .table-card {
+        padding: 18px;
+    }
+}
+</style>
 {% endblock %}
