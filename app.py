@@ -226,17 +226,17 @@ def send_email(to_email, subject, html_message):
     from_email = os.getenv('MAIL_FROM', smtp_user)
 
     if not smtp_host or not smtp_user or not smtp_password or not to_email:
-        print('EMAIL CONFIG ERROR: missing MAIL_* variables or recipient')
+        print('EMAIL SKIPPED: missing MAIL_* variables or recipient')
         return False
 
-    msg = MIMEMultipart()
-    msg['From'] = from_email
-    msg['To'] = to_email
-    msg['Subject'] = subject
-    msg.attach(MIMEText(html_message, 'html', 'utf-8'))
-
     try:
-        server = smtplib.SMTP(smtp_host, smtp_port)
+        msg = MIMEMultipart()
+        msg['From'] = from_email
+        msg['To'] = to_email
+        msg['Subject'] = subject
+        msg.attach(MIMEText(html_message, 'html', 'utf-8'))
+
+        server = smtplib.SMTP(smtp_host, smtp_port, timeout=10)
         server.starttls()
         server.login(smtp_user, smtp_password)
         server.send_message(msg)
@@ -244,10 +244,8 @@ def send_email(to_email, subject, html_message):
         print(f'EMAIL SENT TO: {to_email}')
         return True
     except Exception as e:
-        print('Ошибка отправки email:', e)
+        print('EMAIL ERROR:', e)
         return False
-
-
 def create_notification(user_id, title, message):
     notification = Notification(user_id=user_id, title=title, message=message)
     db.session.add(notification)
@@ -400,28 +398,36 @@ def register():
             consent_accepted=True,
             consent_at=db.func.now()
         )
-        db.session.add(user)
-        db.session.commit()
+
+        try:
+            db.session.add(user)
+            db.session.commit()
+        except Exception as e:
+            db.session.rollback()
+            print('REGISTER DB ERROR:', e)
+            flash('Ошибка регистрации на сервере.')
+            return render_template('register.html')
 
         if email:
-            send_email(
-                email,
-                'Регистрация в AutoKey',
-                f'''
-                <h2>Здравствуйте, {first_name} {last_name}!</h2>
-                <p>Вы успешно зарегистрировались на сайте AutoKey.</p>
-                <p><b>Логин:</b> {username}</p>
-                <p><b>Телефон:</b> {phone if phone else 'не указан'}</p>
-                <p>Теперь вы можете входить в личный кабинет и отслеживать заявки.</p>
-                '''
-            )
+            try:
+                send_email(
+                    email,
+                    'Регистрация в AutoKey',
+                    f'''
+                    <h2>Здравствуйте, {first_name} {last_name}!</h2>
+                    <p>Вы успешно зарегистрировались на сайте AutoKey.</p>
+                    <p><b>Логин:</b> {username}</p>
+                    <p><b>Телефон:</b> {phone if phone else 'не указан'}</p>
+                    <p>Теперь вы можете входить в личный кабинет и отслеживать заявки.</p>
+                    '''
+                )
+            except Exception as e:
+                print('REGISTER EMAIL ERROR:', e)
 
         flash('Регистрация прошла успешно. Теперь войдите в аккаунт.')
         return redirect(url_for('login'))
 
     return render_template('register.html')
-
-
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
