@@ -3,18 +3,18 @@
 
 {% block content %}
 <div class="admin-layout">
-    <aside class="admin-sidebar">
+    <aside class="admin-sidebar" id="adminSidebar">
         <div class="sidebar-brand">
             <h3>Админ-панель</h3>
             <p>Управление заявками и контентом</p>
         </div>
 
         <nav class="sidebar-nav">
-            <a href="{{ url_for('admin_dashboard') }}" class="active">Обзор</a>
-            <a href="{{ url_for('admin_orders') }}">Заявки</a>
-            <a href="{{ url_for('admin_prices') }}">Прайс</a>
-            <a href="{{ url_for('admin_reviews') }}">Отзывы</a>
-            <a href="{{ url_for('admin_users') }}">Пользователи</a>
+            <a href="{{ url_for('admin_dashboard') }}" class="{% if request.endpoint == 'admin_dashboard' %}active{% endif %}">Обзор</a>
+            <a href="{{ url_for('admin_orders') }}" class="{% if request.endpoint == 'admin_orders' %}active{% endif %}">Заявки</a>
+            <a href="{{ url_for('admin_prices') }}" class="{% if request.endpoint == 'admin_prices' %}active{% endif %}">Прайс</a>
+            <a href="{{ url_for('admin_reviews') }}" class="{% if request.endpoint == 'admin_reviews' %}active{% endif %}">Отзывы</a>
+            <a href="{{ url_for('admin_users') }}" class="{% if request.endpoint == 'admin_users' %}active{% endif %}">Пользователи</a>
             <a href="{{ url_for('admin_logout') }}">Выйти</a>
         </nav>
     </aside>
@@ -26,40 +26,40 @@
                 <p>Ключевые показатели, быстрые действия и последние заявки в одной панели.</p>
             </div>
 
-            <div class="stats-grid">
-                <article class="stat-card">
+            <div class="stats-grid dashboard-stats-grid">
+                <article class="stat-card dashboard-stat-card">
                     <h3>Всего заявок</h3>
-                    <strong>{{ total }}</strong>
+                    <strong>{{ total or 0 }}</strong>
                     <p>Общее количество заявок в базе.</p>
                 </article>
 
-                <article class="stat-card">
+                <article class="stat-card dashboard-stat-card">
                     <h3>Новые заявки</h3>
-                    <strong>{{ new }}</strong>
+                    <strong>{{ new or 0 }}</strong>
                     <p>Требуют внимания в первую очередь.</p>
                 </article>
 
-                <article class="stat-card">
+                <article class="stat-card dashboard-stat-card">
                     <h3>В работе</h3>
-                    <strong>{{ in_work }}</strong>
+                    <strong>{{ in_work or 0 }}</strong>
                     <p>Заявки, над которыми сейчас работают.</p>
                 </article>
 
-                <article class="stat-card">
+                <article class="stat-card dashboard-stat-card">
                     <h3>Выполнено</h3>
-                    <strong>{{ done }}</strong>
+                    <strong>{{ done or 0 }}</strong>
                     <p>Завершённые обращения клиентов.</p>
                 </article>
 
-                <article class="stat-card">
+                <article class="stat-card dashboard-stat-card">
                     <h3>Отзывы</h3>
-                    <strong>{{ reviews_count }}</strong>
+                    <strong>{{ reviews_count or 0 }}</strong>
                     <p>Всего отзывов в системе.</p>
                 </article>
 
-                <article class="stat-card">
+                <article class="stat-card dashboard-stat-card">
                     <h3>Услуги</h3>
-                    <strong>{{ services_count }}</strong>
+                    <strong>{{ services_count or 0 }}</strong>
                     <p>Активные позиции в прайсе.</p>
                 </article>
             </div>
@@ -71,26 +71,26 @@
                 <p>Переходы в основные разделы админки без лишних кликов.</p>
             </div>
 
-            <div class="feature-grid">
-                <a href="{{ url_for('admin_orders') }}" class="feature-card">
+            <div class="feature-grid dashboard-feature-grid">
+                <a href="{{ url_for('admin_orders') }}" class="feature-card dashboard-feature-card">
                     <div class="feature-icon">📦</div>
                     <h3>Заявки</h3>
                     <p>Посмотреть новые обращения, изменить статус и отследить работу по клиентам.</p>
                 </a>
 
-                <a href="{{ url_for('admin_prices') }}" class="feature-card">
+                <a href="{{ url_for('admin_prices') }}" class="feature-card dashboard-feature-card">
                     <div class="feature-icon">💳</div>
                     <h3>Прайс</h3>
                     <p>Обновить цены и время выполнения услуг на сайте.</p>
                 </a>
 
-                <a href="{{ url_for('admin_reviews') }}" class="feature-card">
+                <a href="{{ url_for('admin_reviews') }}" class="feature-card dashboard-feature-card">
                     <div class="feature-icon">⭐</div>
                     <h3>Отзывы</h3>
                     <p>Опубликовать, скрыть или удалить отзывы клиентов.</p>
                 </a>
 
-                <a href="{{ url_for('admin_users') }}" class="feature-card">
+                <a href="{{ url_for('admin_users') }}" class="feature-card dashboard-feature-card">
                     <div class="feature-icon">👤</div>
                     <h3>Пользователи</h3>
                     <p>Проверить роли аккаунтов и при необходимости изменить права доступа.</p>
@@ -98,7 +98,7 @@
             </div>
         </section>
 
-        <section class="table-card content-card">
+        <section class="table-card">
             <div class="section-head">
                 <h2>Последние заявки</h2>
                 <p>Свежие обращения клиентов, которые недавно поступили через сайт.</p>
@@ -121,17 +121,19 @@
                         {% for order in orders[:10] %}
                         <tr>
                             <td>#{{ order.id }}</td>
-                            <td class="user-name-cell">{{ order.name }}</td>
-                            <td>{{ order.phone }}</td>
-                            <td class="text-cell">{{ order.car_model }}</td>
-                            <td class="text-cell">{{ order.service }}</td>
+                            <td class="user-name-cell">{{ order.name or '—' }}</td>
+                            <td>{{ order.phone or '—' }}</td>
+                            <td class="text-cell">{{ order.car_model or '—' }}</td>
+                            <td class="text-cell">{{ order.service or '—' }}</td>
                             <td>
                                 {% if order.status == 'выполнена' %}
                                     <span class="status done">{{ order.status }}</span>
                                 {% elif order.status == 'в работе' %}
                                     <span class="status working">{{ order.status }}</span>
+                                {% elif order.status == 'новая' %}
+                                    <span class="status">{{ order.status }}</span>
                                 {% else %}
-                                    <span class="status hidden">{{ order.status }}</span>
+                                    <span class="status hidden">{{ order.status or '—' }}</span>
                                 {% endif %}
                             </td>
                         </tr>
@@ -145,7 +147,7 @@
                 <a href="{{ url_for('admin_reviews') }}" class="btn btn-light">Перейти к отзывам</a>
             </div>
             {% else %}
-            <div class="info-card">
+            <div class="info-card dashboard-empty-card">
                 <h3>Заявок пока нет</h3>
                 <p>Когда клиенты начнут отправлять обращения, они появятся здесь.</p>
             </div>
@@ -158,26 +160,26 @@
                 <p>Небольшой ориентир, чтобы менеджеру было проще понять, с чего начинать работу.</p>
             </div>
 
-            <div class="feature-grid">
-                <div class="feature-card">
+            <div class="feature-grid dashboard-feature-grid">
+                <div class="feature-card dashboard-feature-card">
                     <div class="feature-icon">1</div>
                     <h3>Проверить новые заявки</h3>
                     <p>Сначала обработай все свежие обращения, чтобы не терять горячих клиентов.</p>
                 </div>
 
-                <div class="feature-card">
+                <div class="feature-card dashboard-feature-card">
                     <div class="feature-icon">2</div>
                     <h3>Обновить статусы</h3>
                     <p>Держи статусы заявок актуальными, чтобы было понятно, что в работе, а что завершено.</p>
                 </div>
 
-                <div class="feature-card">
+                <div class="feature-card dashboard-feature-card">
                     <div class="feature-icon">3</div>
                     <h3>Просмотреть отзывы</h3>
                     <p>Публикуй хорошие отзывы и убирай лишний мусор, чтобы сайт выглядел живым и надёжным.</p>
                 </div>
 
-                <div class="feature-card">
+                <div class="feature-card dashboard-feature-card">
                     <div class="feature-icon">4</div>
                     <h3>Проверить прайс</h3>
                     <p>Если менялись цены или сроки, быстро обнови информацию на сайте.</p>
@@ -188,23 +190,6 @@
 </div>
 
 <style>
-.admin-layout {
-    display: grid;
-    grid-template-columns: 280px minmax(0, 1fr);
-    gap: 20px;
-    align-items: start;
-}
-
-.admin-sidebar {
-    position: sticky;
-    top: 20px;
-    padding: 22px;
-    border-radius: 22px;
-    background: rgba(255,255,255,.05);
-    border: 1px solid rgba(255,255,255,.10);
-    backdrop-filter: blur(14px);
-}
-
 .sidebar-brand h3 {
     margin: 0 0 6px;
     font-size: 22px;
@@ -212,7 +197,7 @@
 
 .sidebar-brand p {
     margin: 0 0 18px;
-    opacity: .75;
+    color: var(--muted);
     font-size: 14px;
     line-height: 1.5;
 }
@@ -237,164 +222,49 @@
 
 .sidebar-nav a:hover,
 .sidebar-nav a.active {
-    background: rgba(27, 211, 208, .10);
-    border-color: rgba(27, 211, 208, .18);
-}
-
-.admin-main {
-    display: grid;
-    gap: 18px;
-    min-width: 0;
+    background: rgba(20,184,166,.10);
+    border-color: rgba(20,184,166,.18);
 }
 
 .admin-hero {
     padding: 24px;
 }
 
-.stats-grid {
-    display: grid;
+.dashboard-stats-grid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 14px;
 }
 
-.stat-card {
+.dashboard-stat-card {
     padding: 18px;
     border-radius: 18px;
-    background: rgba(255,255,255,.04);
-    border: 1px solid rgba(255,255,255,.10);
 }
 
-.stat-card h3 {
+.dashboard-stat-card h3 {
     margin: 0 0 10px;
     font-size: 14px;
     opacity: .8;
     font-weight: 600;
 }
 
-.stat-card strong {
-    display: block;
-    font-size: 32px;
-    line-height: 1;
-    margin-bottom: 8px;
-}
-
-.stat-card p {
+.dashboard-stat-card p {
     margin: 0;
-    opacity: .72;
-    line-height: 1.5;
     font-size: 14px;
+    line-height: 1.5;
+    opacity: .72;
 }
 
-.feature-grid {
-    display: grid;
+.dashboard-feature-grid {
     grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: 14px;
 }
 
-.feature-card {
-    display: block;
-    padding: 18px;
-    border-radius: 18px;
-    background: rgba(255,255,255,.04);
-    border: 1px solid rgba(255,255,255,.10);
-    text-decoration: none;
-    color: inherit;
-    transition: var(--transition);
+.dashboard-feature-card {
     min-height: 170px;
 }
 
-.feature-card:hover {
-    transform: translateY(-2px);
-    border-color: rgba(27, 211, 208, .20);
-    background: rgba(27, 211, 208, .07);
-}
-
-.feature-icon {
-    width: 40px;
-    height: 40px;
-    border-radius: 12px;
-    display: grid;
-    place-items: center;
-    margin-bottom: 14px;
-    background: rgba(27, 211, 208, .10);
-    color: #1bd3d0;
-    font-weight: 800;
-}
-
-.feature-card h3 {
-    margin: 0 0 8px;
-    font-size: 18px;
-}
-
-.feature-card p {
+.dashboard-feature-card p {
     margin: 0;
-    opacity: .74;
-    line-height: 1.55;
-}
-
-.table-card {
-    padding: 24px;
-}
-
-.table-wrap {
-    width: 100%;
-    overflow-x: auto;
-}
-
-.admin-orders-table {
-    width: 100%;
-    border-collapse: collapse;
-    min-width: 760px;
-}
-
-.admin-orders-table th,
-.admin-orders-table td {
-    padding: 14px 12px;
-    border-bottom: 1px solid rgba(255,255,255,.08);
-    text-align: left;
-    vertical-align: middle;
-}
-
-.admin-orders-table th {
-    font-size: 13px;
-    text-transform: uppercase;
-    letter-spacing: .04em;
-    opacity: .75;
-}
-
-.text-cell {
-    max-width: 240px;
-}
-
-.user-name-cell {
-    font-weight: 700;
-}
-
-.status {
-    display: inline-flex;
-    align-items: center;
-    min-height: 30px;
-    padding: 0 12px;
-    border-radius: 999px;
-    background: rgba(27, 211, 208, .12);
-    color: #7bf0eb;
-    font-size: 13px;
-    font-weight: 700;
-}
-
-.status.done {
-    background: rgba(67, 122, 34, .18);
-    color: #8bd56a;
-}
-
-.status.working {
-    background: rgba(255, 193, 7, .15);
-    color: #ffd86a;
-}
-
-.status.hidden {
-    background: rgba(255,255,255,.08);
-    color: rgba(255,255,255,.72);
 }
 
 .actions-row {
@@ -404,37 +274,36 @@
     margin-top: 18px;
 }
 
-.info-card {
-    padding: 20px;
-    border-radius: 18px;
-    background: rgba(255,255,255,.04);
-    border: 1px solid rgba(255,255,255,.10);
+.dashboard-empty-card h3 {
+    margin-top: 0;
+    margin-bottom: 8px;
+}
+
+.dashboard-empty-card p {
+    margin: 0;
 }
 
 @media (max-width: 1100px) {
-    .admin-layout {
-        grid-template-columns: 1fr;
-    }
-
-    .admin-sidebar {
-        position: static;
-    }
-
-    .stats-grid,
-    .feature-grid {
+    .dashboard-stats-grid,
+    .dashboard-feature-grid {
         grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 }
 
 @media (max-width: 700px) {
-    .stats-grid,
-    .feature-grid {
+    .dashboard-stats-grid,
+    .dashboard-feature-grid {
         grid-template-columns: 1fr;
     }
 
     .admin-hero,
     .table-card {
         padding: 18px;
+    }
+
+    .actions-row .btn {
+        width: 100%;
+        justify-content: center;
     }
 }
 </style>
