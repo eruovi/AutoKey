@@ -53,6 +53,11 @@
             position: relative;
         }
 
+        body.menu-open {
+            overflow: hidden;
+            touch-action: none;
+        }
+
         body::before,
         body::after {
             content: "";
@@ -128,6 +133,7 @@
             gap: 24px;
             padding: 18px 20px;
             flex-wrap: wrap;
+            position: relative;
         }
 
         .brand {
@@ -138,6 +144,8 @@
             font-size: 18px;
             letter-spacing: .01em;
             min-width: 0;
+            position: relative;
+            z-index: 1001;
         }
 
         .brand-mark {
@@ -170,6 +178,8 @@
             flex-shrink: 0;
             align-items: center;
             justify-content: center;
+            position: relative;
+            z-index: 1001;
         }
 
         .menu-toggle:hover {
@@ -279,6 +289,10 @@
             font-weight: 700;
             border: 1px solid rgba(79,140,255,.24);
             box-shadow: inset 0 1px 0 rgba(255,255,255,.08);
+        }
+
+        .mobile-nav-backdrop {
+            display: none;
         }
 
         .page-shell {
@@ -986,28 +1000,84 @@
                 display: inline-flex;
             }
 
+            .mobile-nav-backdrop {
+                display: block;
+                position: fixed;
+                inset: 0;
+                background: rgba(3, 10, 20, 0.58);
+                backdrop-filter: blur(6px);
+                opacity: 0;
+                visibility: hidden;
+                pointer-events: none;
+                transition: opacity 0.25s ease, visibility 0.25s ease;
+                z-index: 998;
+            }
+
+            .mobile-nav-backdrop.open {
+                opacity: 1;
+                visibility: visible;
+                pointer-events: auto;
+            }
+
             .nav-links,
             .nav-actions {
-                display: none;
-                width: 100%;
-                grid-column: 1 / -1;
+                display: flex;
+                position: fixed;
+                left: 14px;
+                right: 14px;
                 flex-direction: column;
                 align-items: stretch;
                 gap: 12px;
-                padding-top: 10px;
-                animation: fadeUp .25s ease;
+                width: auto;
+                grid-column: auto;
+                opacity: 0;
+                visibility: hidden;
+                pointer-events: none;
+                transform: translateY(-16px);
+                transition:
+                    transform 0.25s ease,
+                    opacity 0.25s ease,
+                    visibility 0.25s ease;
+                z-index: 999;
+            }
+
+            .nav-links {
+                top: 92px;
+                padding: 22px;
+                border-radius: 24px 24px 0 0;
+                background: rgba(6, 16, 29, 0.96);
+                border: 1px solid rgba(255,255,255,.08);
+                border-bottom: none;
+                max-height: calc(100dvh - 240px);
+                overflow-y: auto;
+                overflow-x: hidden;
+            }
+
+            .nav-actions {
+                left: 14px;
+                right: 14px;
+                bottom: 14px;
+                top: auto;
+                padding: 18px 22px 22px;
+                border-radius: 0 0 24px 24px;
+                background: rgba(6, 16, 29, 0.98);
+                border: 1px solid rgba(255,255,255,.08);
+                box-shadow: 0 20px 50px rgba(0,0,0,.35);
             }
 
             .nav-links.open,
             .nav-actions.open {
-                display: flex;
+                opacity: 1;
+                visibility: visible;
+                pointer-events: auto;
+                transform: translateY(0);
             }
 
             .nav-links a,
             .btn,
             .nav-actions a,
             .nav-actions .user-badge,
-            button {
+            .nav-actions button {
                 width: 100%;
                 justify-content: center;
             }
@@ -1125,6 +1195,8 @@
                     <a href="{{ url_for('admin_login') }}" class="btn btn-dark">Вход для персонала</a>
                 {% endif %}
             </div>
+
+            <div class="mobile-nav-backdrop" id="mobileNavBackdrop"></div>
         </div>
     </header>
 
@@ -1227,33 +1299,62 @@
         const menuToggle = document.querySelector('.menu-toggle');
         const mobileMenu = document.querySelector('.nav-links');
         const mobileActions = document.querySelector('.nav-actions');
+        const mobileBackdrop = document.getElementById('mobileNavBackdrop');
         const mobileMenuLinks = document.querySelectorAll('.nav-links a, .nav-actions a');
+
+        function closeMenu() {
+            if (!menuToggle || !mobileMenu || !mobileActions) return;
+            mobileMenu.classList.remove('open');
+            mobileActions.classList.remove('open');
+            if (mobileBackdrop) mobileBackdrop.classList.remove('open');
+            document.body.classList.remove('menu-open');
+            menuToggle.setAttribute('aria-expanded', 'false');
+            menuToggle.setAttribute('aria-label', 'Открыть меню');
+            menuToggle.textContent = '☰';
+        }
+
+        function openMenu() {
+            if (!menuToggle || !mobileMenu || !mobileActions) return;
+            mobileMenu.classList.add('open');
+            mobileActions.classList.add('open');
+            if (mobileBackdrop) mobileBackdrop.classList.add('open');
+            document.body.classList.add('menu-open');
+            menuToggle.setAttribute('aria-expanded', 'true');
+            menuToggle.setAttribute('aria-label', 'Закрыть меню');
+            menuToggle.textContent = '✕';
+        }
 
         if (menuToggle && mobileMenu && mobileActions) {
             menuToggle.addEventListener('click', () => {
-                const isOpen = mobileMenu.classList.toggle('open');
-                mobileActions.classList.toggle('open');
-                menuToggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
-                menuToggle.textContent = isOpen ? '✕' : '☰';
+                const isOpen = mobileMenu.classList.contains('open');
+                if (isOpen) {
+                    closeMenu();
+                } else {
+                    openMenu();
+                }
             });
 
             mobileMenuLinks.forEach(link => {
                 link.addEventListener('click', () => {
                     if (window.innerWidth <= 760) {
-                        mobileMenu.classList.remove('open');
-                        mobileActions.classList.remove('open');
-                        menuToggle.setAttribute('aria-expanded', 'false');
-                        menuToggle.textContent = '☰';
+                        closeMenu();
                     }
                 });
             });
 
+            if (mobileBackdrop) {
+                mobileBackdrop.addEventListener('click', closeMenu);
+            }
+
+            document.addEventListener('keydown', (event) => {
+                if (event.key === 'Escape') {
+                    closeMenu();
+                }
+            });
+
             window.addEventListener('resize', () => {
                 if (window.innerWidth > 760) {
-                    mobileMenu.classList.remove('open');
-                    mobileActions.classList.remove('open');
-                    menuToggle.setAttribute('aria-expanded', 'false');
-                    menuToggle.textContent = '☰';
+                    closeMenu();
                 }
             });
         }
