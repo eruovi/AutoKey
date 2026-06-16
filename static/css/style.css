@@ -851,56 +851,49 @@ tr:hover td {
 
     .nav-links,
     .nav-actions {
-        display: flex;
-        position: fixed;
-        left: 14px;
-        right: 14px;
+        display: none;
+        width: 100%;
+        grid-column: 1 / -1;
         flex-direction: column;
         align-items: stretch;
         gap: 12px;
-        width: auto;
-        grid-column: auto;
-        opacity: 0;
-        visibility: hidden;
-        pointer-events: none;
-        transform: translateY(-16px);
-        transition:
-            transform 0.25s ease,
-            opacity 0.25s ease,
-            visibility 0.25s ease;
-        z-index: 999;
-    }
-
-    .nav-links {
-        top: 92px;
-        padding: 22px;
-        border-radius: 24px 24px 0 0;
-        background: rgba(6, 16, 29, 0.96);
-        border: 1px solid rgba(255,255,255,.08);
-        border-bottom: none;
-        max-height: calc(100dvh - 240px);
-        overflow-y: auto;
-        overflow-x: hidden;
-    }
-
-    .nav-actions {
-        left: 14px;
-        right: 14px;
-        bottom: 14px;
-        top: auto;
-        padding: 18px 22px 22px;
-        border-radius: 0 0 24px 24px;
-        background: rgba(6, 16, 29, 0.98);
-        border: 1px solid rgba(255,255,255,.08);
-        box-shadow: 0 20px 50px rgba(0,0,0,.35);
+        padding-top: 10px;
+        animation: fadeUp .25s ease;
     }
 
     .nav-links.open,
     .nav-actions.open {
-        opacity: 1;
-        visibility: visible;
-        pointer-events: auto;
-        transform: translateY(0);
+        display: flex;
+    }
+
+    .nav-links {
+        position: fixed;
+        left: 14px;
+        right: 14px;
+        top: 92px;
+        z-index: 999;
+        padding: 22px 22px 12px;
+        border-radius: 24px 24px 0 0;
+        background: rgba(6, 16, 29, 0.96);
+        border: 1px solid rgba(255,255,255,.08);
+        border-bottom: none;
+        max-height: none;
+        overflow: visible;
+    }
+
+    .nav-actions {
+        position: fixed;
+        left: 14px;
+        right: 14px;
+        top: auto;
+        bottom: 14px;
+        z-index: 999;
+        padding: 0 22px 22px;
+        border-radius: 0 0 24px 24px;
+        background: rgba(6, 16, 29, 0.96);
+        border: 1px solid rgba(255,255,255,.08);
+        border-top: none;
+        box-shadow: 0 20px 50px rgba(0,0,0,.35);
     }
 
     .nav-links a,
