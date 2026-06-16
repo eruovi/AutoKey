@@ -40,6 +40,11 @@
             overflow-x: hidden;
         }
 
+        body.admin-menu-open {
+            overflow: hidden;
+            touch-action: none;
+        }
+
         a { text-decoration: none; color: inherit; }
         img { max-width: 100%; display: block; }
 
@@ -506,6 +511,13 @@
             color: var(--muted);
         }
 
+        .admin-mobile-bar,
+        .admin-menu-toggle,
+        .admin-sidebar-close,
+        .admin-sidebar-backdrop {
+            display: none;
+        }
+
         @media (max-width: 1024px) {
             .stats-grid { grid-template-columns: 1fr; }
             .admin-layout { grid-template-columns: 1fr; }
@@ -556,6 +568,82 @@
             }
 
             .price-edit-card { padding: 16px; }
+
+            .admin-mobile-bar {
+                display: flex;
+                margin-bottom: 16px;
+            }
+
+            .admin-menu-toggle {
+                display: inline-flex;
+                width: 100%;
+                min-height: 50px;
+                border-radius: 16px;
+                border: 1px solid rgba(148,163,184,.18);
+                background: #0f172a;
+                color: #f8fafc;
+                box-shadow: none;
+            }
+
+            .admin-sidebar-backdrop {
+                display: block;
+                position: fixed;
+                inset: 0;
+                background: rgba(2, 6, 23, 0.7);
+                backdrop-filter: blur(4px);
+                opacity: 0;
+                visibility: hidden;
+                pointer-events: none;
+                transition: opacity .22s ease, visibility .22s ease;
+                z-index: 998;
+            }
+
+            .admin-sidebar-backdrop.open {
+                opacity: 1;
+                visibility: visible;
+                pointer-events: auto;
+            }
+
+            .admin-sidebar {
+                position: fixed;
+                top: 0;
+                left: 0;
+                bottom: 0;
+                width: min(86vw, 320px);
+                height: 100dvh;
+                margin: 0;
+                border-radius: 0 22px 22px 0;
+                z-index: 999;
+                transform: translateX(-110%);
+                transition: transform .25s ease;
+                overflow-y: auto;
+                overscroll-behavior: contain;
+                padding-top: 18px;
+            }
+
+            .admin-sidebar.open {
+                transform: translateX(0);
+            }
+
+            .admin-sidebar-close {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                width: 44px;
+                height: 44px;
+                margin-left: auto;
+                margin-bottom: 14px;
+                border-radius: 14px;
+                border: 1px solid #334155;
+                background: #111827;
+                color: #fff;
+                font-size: 22px;
+                box-shadow: none;
+            }
+
+            .admin-sidebar a {
+                width: 100%;
+            }
         }
     </style>
 </head>
@@ -610,6 +698,15 @@
                 <div class="flash">✅ {{ messages[0] }}</div>
             {% endif %}
         {% endwith %}
+
+        <div class="admin-mobile-bar">
+            <button class="admin-menu-toggle" type="button" aria-label="Открыть меню админки" aria-expanded="false" aria-controls="adminSidebar">
+                ☰ Меню админки
+            </button>
+        </div>
+
+        <div class="admin-sidebar-backdrop" id="adminSidebarBackdrop"></div>
+
         {% block content %}{% endblock %}
     </main>
 
@@ -618,5 +715,104 @@
             Автоключи 33 • Изготовление ключей, аварийное вскрытие, ремонт замков и помощь по Владимиру и области.
         </div>
     </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const adminMenuToggle = document.querySelector('.admin-menu-toggle');
+            const adminBackdrop = document.getElementById('adminSidebarBackdrop');
+
+            function getAdminSidebar() {
+                return document.getElementById('adminSidebar') || document.querySelector('.admin-sidebar');
+            }
+
+            function getAdminCloseButton() {
+                return document.querySelector('.admin-sidebar-close');
+            }
+
+            function ensureCloseButton() {
+                const sidebar = getAdminSidebar();
+                if (!sidebar) return null;
+
+                let closeButton = getAdminCloseButton();
+                if (!closeButton) {
+                    closeButton = document.createElement('button');
+                    closeButton.type = 'button';
+                    closeButton.className = 'admin-sidebar-close';
+                    closeButton.setAttribute('aria-label', 'Закрыть меню');
+                    closeButton.textContent = '✕';
+                    sidebar.insertBefore(closeButton, sidebar.firstChild);
+                }
+
+                if (!sidebar.id) {
+                    sidebar.id = 'adminSidebar';
+                    if (adminMenuToggle) {
+                        adminMenuToggle.setAttribute('aria-controls', 'adminSidebar');
+                    }
+                }
+
+                return closeButton;
+            }
+
+            function closeAdminSidebar() {
+                const sidebar = getAdminSidebar();
+                if (!sidebar || !adminBackdrop || !adminMenuToggle) return;
+                sidebar.classList.remove('open');
+                adminBackdrop.classList.remove('open');
+                document.body.classList.remove('admin-menu-open');
+                adminMenuToggle.setAttribute('aria-expanded', 'false');
+            }
+
+            function openAdminSidebar() {
+                const sidebar = getAdminSidebar();
+                if (!sidebar || !adminBackdrop || !adminMenuToggle) return;
+                ensureCloseButton();
+                sidebar.classList.add('open');
+                adminBackdrop.classList.add('open');
+                document.body.classList.add('admin-menu-open');
+                adminMenuToggle.setAttribute('aria-expanded', 'true');
+            }
+
+            if (adminMenuToggle && adminBackdrop) {
+                adminMenuToggle.addEventListener('click', function () {
+                    const sidebar = getAdminSidebar();
+                    if (!sidebar) return;
+
+                    if (sidebar.classList.contains('open')) {
+                        closeAdminSidebar();
+                    } else {
+                        openAdminSidebar();
+                    }
+                });
+
+                adminBackdrop.addEventListener('click', closeAdminSidebar);
+
+                document.addEventListener('click', function (event) {
+                    const sidebar = getAdminSidebar();
+                    const closeButton = getAdminCloseButton();
+                    if (closeButton && event.target === closeButton) {
+                        closeAdminSidebar();
+                    }
+
+                    if (window.innerWidth <= 760 && sidebar && event.target.closest('.admin-sidebar a')) {
+                        closeAdminSidebar();
+                    }
+                });
+
+                document.addEventListener('keydown', function (event) {
+                    if (event.key === 'Escape') {
+                        closeAdminSidebar();
+                    }
+                });
+
+                window.addEventListener('resize', function () {
+                    if (window.innerWidth > 760) {
+                        closeAdminSidebar();
+                    }
+                });
+
+                ensureCloseButton();
+            }
+        });
+    </script>
 </body>
 </html>
